@@ -65,7 +65,7 @@ if(isset($_POST['return'])) {
                         <p><?= h($_SESSION['register']['regi_pass']) ?></p>
                     </div>
                     <div class="btn-confirm">
-                        <!--ボタンごとに処理を分ける-->
+                        <!-- ボタンごとに処理を分ける -->
                         <button type="submit" name="return">戻る</button>
                         <button type="submit" name="register">登録</button>
                     </div>

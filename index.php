@@ -250,7 +250,7 @@ if (isset($_FILES['image'])) {
                         </div>
                     </form>
                 
-                    <!--エラーメッセージの表示-->
+                    <!-- エラーメッセージの表示 -->
                     <?php if ($error['content'] === 'blank') : ?>
                         <p>投稿文は必ず入力してください。</p>
                     <?php endif; ?>
@@ -279,9 +279,9 @@ if (isset($_FILES['image'])) {
             <div class="timeline">
                 <div class="container">
                     <div class="timeline-contents">
-                        <!--フォローしているユーザーの投稿、ログインユーザーの投稿と返信をタイムラインに表示-->
+                        <!-- フォローしているユーザーの投稿、ログインユーザーの投稿と返信をタイムラインに表示 -->
                         <?php foreach ($posts as $post ) : ?> 
-                            <!---アイコン----->
+                            <!-- アイコン -->
                             <div class="timeline-icon">
                                 <?php
                                     $icon_row = get_icon($post['user_id']);
@@ -292,67 +292,67 @@ if (isset($_FILES['image'])) {
                                     <?php endif; ?>
                             </div>
 
-                            <!---ユーザー名----->
+                            <!-- ユーザー名 -->
                             <div class="timeline-username">
                                 <p><?= h(get_user_name($post['user_id'])) ?></p>
                             </div>
 
                             <div class="timeline-post">
-                                <!------返信文------>
+                                <!-- 返信文 -->
                                 <?php if (isset($post['reply_id'])) : ?>  
                                     <p>RE: <?= h($post['content']) ?></p>
-                                <!------投稿文------>
+                                <!-- 投稿文 -->
                                 <?php else : ?>
                                     <p><?= h($post['content']) ?></p>   
                                 <?php endif; ?>
                             </div>
                                 
-                            <!-----画像------>
+                            <!-- 画像 -->
                             <div> 
                                 <?php if(isset($post['file_path'])) : ?>
                                     <p><img src="<?= h($post['file_path']) ?>" class="image"></p>
                                 <?php endif; ?>                         
                             </div>
 
-                            <!-----投稿日時----->
+                            <!-- 投稿日時 -->
                             <div class="timeline-date">
                                 <p><?= h($post['created_at']) ?></p>
                             </div>
 
-                            <!-----いいねの数----->
+                            <!-- いいねの数 -->
                             <?php if (isset($post['reply_id'])) : ?>
                                 <p class="timeline-likes"><img src="images/heart.png"><?= h(get_rep_likes_number($post['reply_id'])) ?></p>
                             <?php else : ?>
                                 <p class="timeline-likes"><img src="images/heart.png"><?= h(get_likes_number($post['post_id'])) ?></p>
                             <?php endif; ?>
 
-                            <!------ボタン------>
+                            <!-- ボタン -->
                             <div class="timeline-buttons">
                                 <ul class="timeline-btn-list">
-                                    <!------返信ボタン------>
+                                    <!-- 返信ボタン -->
                                     <?php if (isset($post['reply_id'])) : ?>
-                                        <!---post_idとreply_idをセッションに保存する--->
+                                        <!---post_idとreply_idをセッションに保存する -->
                                         <form action="" method="post">
                                             <input type="hidden" name="reply_btn_reply" value=<?= h($post['post_id']) ?>>
                                             <input type="hidden" name="reply_btn_reply_id" value=<?= h($post['reply_id']) ?>>
                                             <li><button type="submit">返信</button></li>
                                         </form>
                                     <?php else : ?>
-                                        <!---post_idをセッションに保存する--->
+                                        <!-- post_idをセッションに保存する -->
                                         <form action="" method="post">
                                             <input type="hidden" name="reply_btn_post" value=<?= h($post['post_id']) ?>>
                                             <li><button type="submit">返信</button></li>
                                         </form>
                                     <?php endif; ?>
 
-                                    <!-----アカウントボタン------>
+                                    <!-- アカウントボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="user_page" value=<?= h($post['user_id']) ?>>
                                         <li><button type="submit">アカウント</button></li>
                                     </form>
 
-                                    <!-----いいねボタン------>
-                                    <!-----返信に対するいいねボタン------>
+                                    <!-- いいねボタン -->
+                                    <!-- 返信に対するいいねボタン -->
                                     <?php if (isset($post['reply_id'])) : ?>
                                         <?php $reply_is_liked_id = get_rep_likes($post['reply_id']) ?>
                                         <form action="" method="post">
@@ -365,7 +365,7 @@ if (isset($_FILES['image'])) {
                                             <?php endif; ?>                         
                                         </form>
                                     <?php else : ?>
-                                        <!-----投稿に対するいいねボタン------>
+                                        <!-- 投稿に対するいいねボタン -->
                                         <?php $post_is_liked_id = get_likes($post['post_id']) ?>
                                         <form action="" method="post">
                                             <?php if ($post_is_liked_id) : ?>
@@ -378,8 +378,8 @@ if (isset($_FILES['image'])) {
                                         </form>
                                     <?php endif; ?>   
 
-                                    <!-----ブックマークボタン------>
-                                    <!-----返信に対するブックマークボタン------>
+                                    <!-- ブックマークボタン -->
+                                    <!-- 返信に対するブックマークボタン -->
                                     <?php if (isset($post['reply_id'])) : ?>
                                         <?php $reply_bm_id = get_rep_bookmarks($post['reply_id']) ?>
                                         <form action="" method="post">
@@ -392,7 +392,7 @@ if (isset($_FILES['image'])) {
                                             <?php endif; ?>                         
                                         </form>
                                     <?php else : ?>
-                                        <!-----投稿に対するブックマークボタン------>
+                                        <!-- 投稿に対するブックマークボタン -->
                                         <?php $post_bm_id = get_bookmarks($post['post_id']) ?>
                                         <form action="" method="post">
                                             <?php if ($post_bm_id) : ?>
@@ -405,16 +405,16 @@ if (isset($_FILES['image'])) {
                                         </form>
                                     <?php endif; ?>
 
-                                    <!-----削除ボタン------>
-                                    <!-----ログインユーザーの投稿or返信のみ表示する------>            
+                                    <!-- 削除ボタン-->
+                                    <!-- ログインユーザーの投稿or返信のみ表示する -->            
                                     <?php if($post['user_id'] === $_SESSION['login']['member_id']) : ?>
-                                        <!-----返信に対する削除ボタン------>
+                                        <!-- 返信に対する削除ボタン -->
                                         <?php if (isset($post['reply_id'])) : ?>
                                             <form action="" method="post">
                                                 <input type="hidden" name="delete_reply" value=<?= h($post['reply_id']) ?>>
                                                 <li><button type="submit">削除</button></li>
                                             </form>
-                                        <!-----投稿に対する削除ボタン------>            
+                                        <!-- 投稿に対する削除ボタン -->            
                                         <?php else : ?>
                                             <form action="" method="post">
                                                 <input type="hidden" name="delete_post" value=<?= h($post['post_id']) ?>>

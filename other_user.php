@@ -229,18 +229,18 @@ if (isset($_POST['block_user'])) {
             <div class="other-user">
                 <div class="container">
                     <div class="user-profile">
-                        <!-----アイコン----->
+                        <!-- アイコン -->
                         <?php if (empty($icon_row)) : ?>
                             <p><img src="images/animalface_tanuki.png" class="icon"><p>
                         <?php else : ?>    
                             <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
                         <?php endif; ?>
-                        <!-----ユーザー名------>
+                        <!-- ユーザー名 -->
                         <h3><?= h($user_name_row['name']) ?></h3>
-                        <!----プロフィール文---->
+                        <!-- プロフィール文 -->
                         <p><?= h($profile_row['profile_content']) ?></p>
                         <div class="follow-block">
-                            <!-----フォロー、アンフォロー----->
+                            <!-- フォロー、アンフォロー -->
                             <form action="" method="post">
                                 <?php
                                 $is_following = false;
@@ -262,7 +262,7 @@ if (isset($_POST['block_user'])) {
                                     <button type="submit">フォローする</button>
                                 <?php endif; ?>
                             </form>
-                            <!-----ブロック----->
+                            <!-- ブロック -->
                             <form action="" method="post">
                                 <input type="hidden" name="block_user" value=<?= h($_SESSION['other_user']) ?>>  
                                 <button type="submit">ブロックする</button>
@@ -270,45 +270,45 @@ if (isset($_POST['block_user'])) {
                         </div>    
                     </div>    
 
-                    <!---------投稿一覧--------->
+                    <!-- 投稿一覧 -->
                     <div class="user-posts">
                         <h3>投稿一覧</h3>
                         <?php while ($post_row = $post_stmt->fetch()) : ?>
                             <div class="user-post">
-                                <!-----アイコン----->
+                                <!-- アイコン -->
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>    
                                     <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
                                 <?php endif; ?>                                
-                                <!-----ユーザー名----->
+                                <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($post_row['user_id'])) ?></p>
                             </div>    
 
-                            <!-----投稿文----->
+                            <!-- 投稿文 -->
                             <p class="user-post-stmt"><?= h($post_row['content']) ?></p>
                             
-                            <!-----画像------>
+                            <!-- 画像 -->
                             <?php if(isset($post_row['file_path'])) : ?>
                                 <p class="user-post-image"><img src="<?= h($post_row['file_path']) ?>" class="image"></p>
                             <?php endif; ?>
                             
-                            <!-----いいねの数----->
+                            <!-- いいねの数 -->
                             <p class=""><img src="images/heart.png"> <?= h(get_likes_number($post_row['post_id'])) ?></p>
                         
-                            <!-----投稿日時----->
+                            <!-- 投稿日時 -->
                             <p><?= h($post_row['created_at']) ?></p>
 
-                            <!-----ボタン---->
+                            <!-- ボタン -->
                             <div class="user-post-buttons">
                                 <ul class="user-post-btn-list">
-                                    <!-----返信ボタン---->
+                                    <!-- 返信ボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="reply_btn" value=<?= h($post_row['post_id']) ?>>  
                                         <li><input type="submit" value="返信" class="user-button"></li>
                                     </form>
                         
-                                    <!-----いいねボタン------>
+                                    <!-- いいねボタン -->
                                     <?php $post_is_liked_id = get_likes($post_row['post_id']) ?>
                                     <form action="" method="post">
                                         <?php if ($post_is_liked_id) : ?>
@@ -320,7 +320,7 @@ if (isset($_POST['block_user'])) {
                                         <?php endif; ?> 
                                     </form>
 
-                                    <!-----ブックマークボタン------>
+                                    <!-- ブックマークボタン -->
                                     <?php $post_bm_id = get_bookmarks($post_row['post_id']) ?>
                                     <form action="" method="post">
                                         <?php if ($post_bm_id) : ?>
@@ -336,12 +336,12 @@ if (isset($_POST['block_user'])) {
                         <?php endwhile; ?>
                     </div>
 
-                    <!---------返信一覧--------->
+                    <!-- 返信一覧 -->
                     <div class="user-replies">
                         <h3>返信一覧</h3>
                         <?php while ($reply_row = $reply_stmt->fetch()) : ?>
                             <div class="user-reply">
-                                <!-----アイコン----->
+                                <!-- アイコン -->
                                 <?php
                                 $icon_stmt = get_icon($reply_row['user_id']);
                                 $icon_row = $icon_stmt->fetch();
@@ -351,34 +351,34 @@ if (isset($_POST['block_user'])) {
                                 <?php else : ?>    
                                     <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
                                 <?php endif; ?>
-                                <!-----ユーザー名----->
+                                <!-----ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($reply_row['user_id'])) ?></p>
                             </div>
 
-                            <!-----投稿文----->
+                            <!-- 投稿文 -->
                             <p class="user-post-stmt"><?= h($reply_row['content']) ?></p>
                             
-                            <!-----画像------>
+                            <!-- 画像 -->
                             <?php if(isset($reply_row['file_path'])) : ?>
                                 <p><img src="<?= h($reply_row['file_path']) ?>" class="image"></p>
                             <?php endif; ?>
                             
-                            <!-----いいねの数----->
+                            <!-- いいねの数 -->
                             <p class=""><img src="images/heart.png"> <?= h(get_rep_likes_number($reply_row['reply_id'])) ?></p>
 
-                            <!-----投稿日時----->
+                            <!-- 投稿日時 -->
                             <p><?= h($reply_row['created_at']) ?></p>
                             
-                            <!-----ボタン---->
+                            <!-- ボタン -->
                             <div class="user-reply-buttons">
                                 <ul class="user-reply-btn-list">
-                                    <!-----返信ボタン---->
+                                    <!-- 返信ボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="reply_btn" value=<?= h($reply_row['post_id']) ?>>  
                                         <li><input type="submit" value="返信" class="user-button"></li>
                                     </form>
 
-                                    <!-----いいねボタン------>
+                                    <!-- いいねボタン -->
                                     <?php $reply_is_liked_id = get_rep_likes($reply_row['reply_id']) ?>
                                     <form action="" method="post">
                                         <?php if ($reply_is_liked_id) : ?>
@@ -390,7 +390,7 @@ if (isset($_POST['block_user'])) {
                                         <?php endif; ?> 
                                     </form>
 
-                                    <!-----ブックマークボタン------>
+                                    <!-- ブックマークボタン -->
                                     <?php $reply_bm_id = get_rep_bookmarks($reply_row['reply_id']) ?>
                                     <form action="" method="post">
                                         <?php if ($reply_bm_id) : ?>
@@ -406,12 +406,12 @@ if (isset($_POST['block_user'])) {
                         <?php endwhile; ?> 
                     </div>    
 
-                    <!---------いいね一覧---------->
+                    <!-- いいね一覧 -->
                     <div class="user-goods">
                     <h3>いいね一覧</h3>                
                         <?php foreach ($post_likes_reps as $post_like_rep) : ?>
                             <div class="user-good">
-                                <!-----アイコン----->
+                                <!-- アイコン -->
                                 <?php
                                 $icon_stmt = get_icon($post_like_rep['user_id']);
                                 $icon_row = $icon_stmt->fetch();
@@ -422,42 +422,42 @@ if (isset($_POST['block_user'])) {
                                     <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
                                 <?php endif; ?>  
 
-                                <!-----ユーザー名----->
+                                <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($post_like_rep['user_id'])) ?></p>
                             </div>
 
-                            <!-----投稿文----->
+                            <!-- 投稿文 -->
                             <?php if (isset($post_like_rep['reply_id'])) : ?>  
                                 <p class="user-post-stmt">RE:<?= h($post_like_rep['content']) ?></p>
                             <?php else : ?>
                                 <p class="user-post-stmt"><?= h($post_like_rep['content']) ?></p>
                             <?php endif; ?>
                             
-                            <!-----画像------>
+                            <!-- 画像 -->
                             <?php if(isset($post_like_rep['file_path'])) : ?>
                                 <p><img src="<?= h($post_like_rep['file_path']) ?>" class="image"></p>
                             <?php endif; ?>
                             
-                            <!-----いいねの数----->
+                            <!-- いいねの数 -->
                             <?php if (isset($post_like_rep['reply_id'])) : ?>
                                 <p class=""><img src="images/heart.png"> <?= h(get_rep_likes_number($post_like_rep['reply_id'])) ?></p>
                             <?php else : ?>
                                 <p class=""><img src="images/heart.png"> <?= h(get_likes_number($post_like_rep['post_id'])) ?></p>
                             <?php endif; ?>
                         
-                            <!-----投稿日時----->
+                            <!-- 投稿日時 -->
                             <p><?= h($post_like_rep['created_at']) ?></p>
 
-                            <!-----ボタン---->
+                            <!-- ボタン -->
                             <div class="user-good-buttons">
                                 <ul class="user-good-btn-list">
-                                    <!-----返信ボタン---->
+                                    <!-- 返信ボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="reply_btn" value=<?= h($post_like_rep['post_id']) ?>>  
                                         <li><input type="submit" value="返信" class="user-button"></li>
                                     </form>
 
-                                    <!-----アカウントボタン----->
+                                    <!-- アカウントボタン -->
                                     <?php if ($post_like_rep['user_id'] != $_SESSION['other_user']) : ?>
                                     <form action="" method="post">
                                         <input type="hidden" name="user_page" value=<?= h($post_like_rep['user_id']) ?>>
@@ -465,8 +465,8 @@ if (isset($_POST['block_user'])) {
                                     </form>
                                     <?php endif ?>
 
-                                    <!-----いいねボタン------>
-                                    <!-----返信に対するいいねボタン------>
+                                    <!-- いいねボタン -->
+                                    <!-- 返信に対するいいねボタン -->
                                     <?php if (isset($post_like_rep['reply_id'])) : ?>
                                         <form action="" method="post">
                                             <?php
@@ -487,7 +487,7 @@ if (isset($_POST['block_user'])) {
                                             <?php endif; ?>                         
                                         </form>
                                     <?php else : ?>
-                                        <!-----投稿に対するいいねボタン------>
+                                        <!-- 投稿に対するいいねボタン -->
                                         <form action="" method="post">
                                             <?php
                                             $post_is_liked = false;
@@ -507,7 +507,7 @@ if (isset($_POST['block_user'])) {
                                             <?php endif; ?>                         
                                         </form>
                                     <?php endif; ?>
-                                        <!-----返信に対するブックマークボタン------>
+                                        <!-- 返信に対するブックマークボタン -->
                                         <?php if (isset($post_like_rep['reply_id'])) : ?>
                                             <?php $reply_bm_id = get_rep_bookmarks($post_like_rep['reply_id']) ?>
                                             <form action="" method="post">
@@ -522,7 +522,7 @@ if (isset($_POST['block_user'])) {
 
                                         <?php else : ?>
 
-                                            <!-----投稿に対するブックマークボタン------>
+                                            <!-- 投稿に対するブックマークボタン -->
                                             <?php
                                             $post_bm_id = get_bookmarks($post_like_rep['post_id']) ?>
                                             <form action="" method="post">
@@ -536,16 +536,16 @@ if (isset($_POST['block_user'])) {
                                             </form>
                                         <?php endif; ?>
                         
-                                    <!-----削除ボタン------>
-                                    <!---ログインユーザーの投稿or返信いいねのみ表示する------>
+                                    <!-- 削除ボタン -->
+                                    <!-- ログインユーザーの投稿or返信いいねのみ表示する -->
                                     <?php if ($post_like_rep['user_id'] === $_SESSION['login']['member_id']) : ?>
-                                        <!-----返信に対する削除ボタン------>
+                                        <!-- 返信に対する削除ボタン -->
                                         <?php if (isset($post_like_rep['reply_id'])) : ?>
                                             <form action="" method="post">
                                                 <input type="hidden" name="delete_reply" value=<?= h($post_like_rep['reply_id']) ?>>
                                                 <li><input type="submit" value="削除" class="user-button"></li>
                                             </form>
-                                        <!-----投稿に対する削除ボタン------>            
+                                        <!-- 投稿に対する削除ボタン -->            
                                         <?php else : ?>
                                             <form action="" method="post">
                                                 <input type="hidden" name="delete_post" value=<?= h($post_like_rep['post_id']) ?>>
@@ -557,13 +557,13 @@ if (isset($_POST['block_user'])) {
                             </div>
                         <?php endforeach; ?> 
 
-                    <!---------フォロー一覧---------->
+                    <!-- フォロー一覧 -->
                     <div class="user-follows">
                         <h3>フォロー一覧</h3>
                         <?php $other_user_follows = get_follow($_SESSION['other_user']) ?>
                         <?php foreach ($other_user_follows as $other_user_follow) : ?>
                             <div class="user-follow">
-                                <!-----アイコン----->      
+                                <!-- アイコン -->      
                                 <?php 
                                 $icon_stmt = get_icon($other_user_follow['is_followed']);
                                 $icon_row = $icon_stmt->fetch();
@@ -573,20 +573,20 @@ if (isset($_POST['block_user'])) {
                                 <?php else : ?>    
                                     <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
                                 <?php endif; ?>
-                                <!-----ユーザー名----->
+                                <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($other_user_follow['is_followed'])) ?></p>
                             </div>
 
                             <div class="user-follow-buttons">
                                 <ul class="user-follow-btn-list">
-                                <!-----アカウントボタン----->
+                                <!-- アカウントボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="user_page" value=<?= h($other_user_follow['is_followed']) ?>>
                                         <li><input type="submit" value="アカウント" class="user-button"></li>
                                     </form>
                          
-                                <!-----フォロー、アンフォロー----->
-                                <!---$other_user_follow（参照中ユーザーにフォローされているユーザー全件の配列）のうち、ログインユーザーであるものはスキップする---->
+                                <!-- フォロー、アンフォロー -->
+                                <!-- other_user_follow（参照中ユーザーにフォローされているユーザー全件の配列）のうち、ログインユーザーであるものはスキップする---->
                                     <?php if ($other_user_follow['member_id'] !== $_SESSION['login']['member_id']) : ?>
                                         <form action="" method="post">
                                             <?php
@@ -616,12 +616,12 @@ if (isset($_POST['block_user'])) {
                         <?php endforeach; ?>
                     </div>
 
-                    <!---------フォロワー一覧--------->
+                    <!-- フォロワー一覧 -->
                     <div class="user-followers">
                         <h3>フォロワー一覧</h3>
                         <?php while ($is_followed_row = $is_followed_stmt->fetch()) : ?>
                         <div class="user-follower">
-                            <!-----アイコン----->
+                            <!-- アイコン -->
                             <?php 
                             $icon_stmt = get_icon($is_followed_row['follow']);
                             $icon_row = $icon_stmt->fetch();
@@ -631,19 +631,19 @@ if (isset($_POST['block_user'])) {
                             <?php else : ?>    
                                 <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
                             <?php endif; ?>
-                            <!-----ユーザー名----->
+                            <!-- ユーザー名 -->
                             <p class="user-username"><?= h(get_user_name($is_followed_row['follow'])) ?></p>
                         </div>
 
                         <div class="user-follower-buttons">
                             <ul class="user-follower-btn-list"> 
-                                <!-----アカウントボタン----->
+                                <!-- アカウントボタン -->
                                 <form action="" method="post">
                                     <input type="hidden" name="user_page" value=<?= h($is_followed_row['follow']) ?>>
                                     <li><input type="submit" value="アカウント" class="user-button"></li>
                                 </form>
-                                <!-----フォロー、アンフォロー----->
-                                <!---$is_followed_rowがログインユーザーであるものはスキップする---->
+                                <!-- フォロー、アンフォロー -->
+                                <!-- $is_followed_rowがログインユーザーであるものはスキップする---->
                                 <?php if ($is_followed_row['member_id'] !== $_SESSION['login']['member_id']) : ?>
                                     <form action="" method="post">
                                         <?php

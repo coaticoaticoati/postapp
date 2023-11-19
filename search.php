@@ -65,7 +65,7 @@ if (isset($_POST['search'])) {
 
 // 削除ボタンが押された場合
 if (isset($_POST['delete_post'])) {
-    delete_post((int)$_POST['delete_post']);   
+    delete_post((int)$_POST['delete_post']);
 }
 
 // いいねボタンが押された場合
@@ -76,6 +76,16 @@ if (isset($_POST['insert_like'])) {
 // いいね解除ボタンが押された場合
 if (isset($_POST['delete_like'])) {
     delete_like((int)$_POST['delete_like']);
+}
+
+// ブックマークボタンが押された場合
+if (isset($_POST['insert_bm'])) {
+    insert_bookmark((int)$_POST['insert_bm']);
+}
+
+// ブックマーク解除ボタンが押された場合
+if (isset($_POST['delete_bm'])) {
+    delete_bookmark((int)$_POST['delete_bm']);
 }
 
 // -------いいね---------
@@ -129,6 +139,7 @@ while ($block_row = $block_stmt->fetch()) {
                         </form>
                     </div> 
                     
+                    <!-- ポストの検索結果 -->
                     <div class="post-results">
                         <h3>ポストの検索結果</h3>
                             <?php 
@@ -142,12 +153,9 @@ while ($block_row = $block_stmt->fetch()) {
                                 }  // $block_search が true の場合、検索結果を表示する
                                 if ($block_search) :
                             ?>      
-                                    <!---アイコン----->
+                                    <!-- アイコン -->
                                     <div>      
-                                        <?php
-                                        $icon_stmt = get_icon($search_post['user_id']);
-                                        $icon_row = $icon_stmt->fetch();
-                                        ?>
+                                        <?php $icon_row = get_icon($search_post['user_id']) ?>
                                         <?php if (empty($icon_row)) : ?>
                                             <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                         <?php else : ?>        
@@ -155,48 +163,47 @@ while ($block_row = $block_stmt->fetch()) {
                                         <?php endif; ?>
                                     </div>
 
-                                    <!---ユーザー名----->
+                                    <!-- ユーザー名 -->
                                     <div class="search-username">
-                                        <?php
-                                        $user_name_stmt = get_user_name($search_post['user_id']);
-                                        $user_name_row = $user_name_stmt->fetch();
-                                        ?>
-                                        <p><?= h($user_name_row['name']) ?></p>
+                                        <p><?= h(get_user_name($search_post['user_id'])) ?></p>
                                     </div>
 
-                                    <!------投稿文------>
+                                    <!-- 投稿文 -->
                                     <div class="">
                                         <p><?= h($search_post['content']) ?></p>
                                     </div>
 
-                                    <!-----画像を表示------>
+                                    <!-- 画像を表示 -->
                                     <div>                                    
                                         <?php if(isset($row['file_path'])) : ?>
                                             <p><img src="<?= h($search_post['file_path']) ?>" class="image"></p>
                                         <?php endif; ?>
                                     </div>    
 
-                                    <!-----投稿日時----->
+                                    <!-- 投稿日時 -->
                                     <div>
                                         <p><?= h($search_post['created_at']) ?></p>
                                     </div>
+
+                                    <!-- いいねの数 -->
+                                    <p class="timeline-likes"><img src="images/heart.png"><?= h(get_likes_number($post['post_id'])) ?></p>
                                     
                                     <div class="search-buttons">
                                         <ul class="search-btn-list">
-                                            <!------返信ボタン------>
+                                            <!-- 返信ボタン -->
                                             <form action="" method="post">
                                                 <input type="hidden" name="reply_btn" value=<?= h($search_post['post_id']) ?>>
                                                 <li><button type="submit">返信</button></li>
                                             </form>
                                     
-                                            <!-----アカウントボタン------>
+                                            <!-- アカウントボタン -->
                                             <form action="" method="post">
                                                 <input type="hidden" name="user_page" value=<?= h($search_post['user_id']) ?>>
                                                 <li><button type="submit">アカウント</button></li>
                                             </form>
                                     
-                                            <!-----いいねボタン------>
-                                            <!-----投稿に対するいいねボタン------>
+                                            <!-- いいねボタン -->
+                                            <!-- 投稿に対するいいねボタン -->
                                             <form action="" method="post">
                                                 <?php
                                                 $post_is_liked_id = false;
@@ -215,11 +222,23 @@ while ($block_row = $block_stmt->fetch()) {
                                                     <li><button type="submit">いいね</button></li>
                                                 <?php endif; ?>                         
                                             </form>  
+
+                                            <!-- ブックマークボタン -->
+                                            <?php $post_bm_id = get_bookmarks($search_post['post_id']) ?>
+                                            <form action="" method="post">
+                                                <?php if ($post_bm_id) : ?>
+                                                    <input type="hidden" name="delete_bm" value=<?= h($search_post['post_id']) ?>>
+                                                    <li><button type="submit">ブックマーク解除</button></li>
+                                                <?php else : ?>
+                                                    <input type="hidden" name="insert_bm" value=<?= h($search_post['post_id']) ?>>
+                                                    <li><button type="submit">ブックマーク</button></li>
+                                                <?php endif; ?>                         
+                                            </form>
                             
-                                            <!-----削除ボタン------>
-                                            <!-----ログインユーザーの投稿のみ表示する------>            
+                                            <!-- 削除ボタン -->
+                                            <!-- ログインユーザーの投稿のみ表示する -->            
                                             <?php if($search_post['user_id'] === $_SESSION['login']['member_id']) : ?>
-                                                <!-----投稿に対する削除ボタン------>  
+                                                <!-- 投稿に対する削除ボタン -->  
                                                 <form action="" method="post">
                                                     <input type="hidden" name="delete_post" value=<?= h($search_post['post_id']) ?>>
                                                     <li><button type="submit">削除</button></li>
@@ -231,54 +250,41 @@ while ($block_row = $block_stmt->fetch()) {
                             <?php endforeach; ?>
                     </div>
 
+                    <!-- ユーザーの検索結果 -->
                     <div class="user-results">                     
                         <h3>ユーザーの検索結果</h3>
-                            <?php foreach ($search_prof_results as $search_prof) : ?> 
-                                <!---アイコン----->
-                                <div>      
-                                    <?php
-                                    $icon_stmt = get_icon($search_prof['user_id']);
-                                    $icon_row = $icon_stmt->fetch();
-                                    ?>
-                                    <?php if (empty($icon_row)) : ?>
-                                        <p><img src="images/animalface_tanuki.png" class="icon"><p>
-                                    <?php else : ?>        
-                                        <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
-                                    <?php endif; ?>
-                                </div>
+                        <?php foreach ($search_prof_results as $search_prof) : ?> 
+                            <!-- アイコン -->
+                            <div>      
+                                <?php $icon_row = get_icon($search_prof['user_id']) ?>
+                                <?php if (empty($icon_row)) : ?>
+                                    <p><img src="images/animalface_tanuki.png" class="icon"><p>
+                                <?php else : ?>        
+                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                                <?php endif; ?>
+                            </div>
 
-                                <!---ユーザー名----->
-                                <div class="search-username">
-                                    <?php
-                                    $user_name_stmt = get_user_name($search_prof['user_id']);
-                                        $user_name_row = $user_name_stmt->fetch();
-                                    ?>
-                                    <p><?= h($user_name_row['name']) ?></p>
-                                </div>  
+                            <!-- ユーザー名 -->
+                            <div class="search-username">
+                                <p><?= h(get_user_name($search_prof['user_id'])) ?></p>
+                            </div>  
 
-                                <!-----プロフィール文----->
-                                <div>
-                                    <?php
-                                    $profile_stmt = get_profile($search_prof['user_id']);
-                                    $profile_row = $profile_stmt->fetch();
-                                    ?>
-                                    <p><?= h($profile_row['profile_content']) ?></p>
-                                </div>
+                            <!-- プロフィール文 -->
+                            <div>
+                                <p><?= h(get_profile($search_prof['user_id'])) ?></p>
+                            </div>
 
-                                <!-----アカウントボタン------>
-                                <div class="search-buttons">
-                                    <form action="" method="post">
-                                        <input type="hidden" name="user_page" value=<?= h($search_prof['user_id']) ?>>
-                                        <button type="submit" class="search-users-btn-account">アカウント</button>
-                                    </form>
-                                </div>
-                            <?php endforeach; ?>
+                            <!-- アカウントボタン -->
+                            <div class="search-buttons">
+                                <form action="" method="post">
+                                    <input type="hidden" name="user_page" value=<?= h($search_prof['user_id']) ?>>
+                                    <button type="submit" class="search-users-btn-account">アカウント</button>
+                                </form>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div> 
             </div>               
-        </main>
-        <footer>
-
-        </footer>    
+        </main>   
     </body>    
 </html>          

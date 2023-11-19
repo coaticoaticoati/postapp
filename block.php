@@ -24,11 +24,7 @@ if (isset($_POST['unblock_user'])) {
 <html lang="ja">
     <head>
         <meta charset="utf-8">
-        <?php
-        $user_name_stmt = get_user_name($_SESSION['other_user']);
-        $user_name_row = $user_name_stmt->fetch();
-        ?>
-        <title><?= h($user_name_row['name']) ?>さんのプロフィール</title>
+        <title><?= h(get_user_name($_SESSION['other_user'])) ?>さんのプロフィール</title>
         <link rel="stylesheet" href="stylesheet.css">
     </head>
     <body>
@@ -48,21 +44,19 @@ if (isset($_POST['unblock_user'])) {
                 <div class="container">
                     <?php
                     // ログインユーザーが参照中ユーザーをブロックしている、ログインユーザーが参照中ユーザーにブロックされてるか確認
-                    $block_stmt = get_block_user($_SESSION['other_user']);
-                    $block_user = $block_stmt->fetch();
-                    $is_blocked_stmt = get_blocked_user($_SESSION['other_user']);
-                    $blocked_user = $is_blocked_stmt->fetch();
+                    $block_user = get_block_user($_SESSION['other_user']);
+                    $blocked_user = get_blocked_user($_SESSION['other_user']);
 
                     // ブロックしているか、されているかで表示を変える
                     if (!empty($block_user)) :
                     ?>
                         <form action="" method="post">
                             <input type="hidden" name="unblock_user" value=<?= h($_SESSION['other_user']) ?>>  
-                            <h4><?= h($user_name_row['name']) ?>さんをブロックしています。ブロックを解除しますか。</h4>
+                            <h4><?= h(get_user_name($_SESSION['other_user'])) ?>さんをブロックしています。ブロックを解除しますか。</h4>
                             <button type="submit">解除する</button>
                         </form>
                     <?php elseif (!empty($blocked_user)) : ?>
-                        <h4><?= h($user_name_row['name']) ?>さんはあなたをブロックしています。</h4>
+                        <h4><?= h(get_user_name($_SESSION['other_user'])) ?>さんはあなたをブロックしています。</h4>
                     <?php endif; ?>  
                 </div>
             </div>

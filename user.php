@@ -183,49 +183,49 @@ while ($block_row = $block_stmt->fetch()) {
                         <button><a href="profile_edit.php">プロフィールを編集</a></button>
                     </div>
 
-                    <!---------投稿一覧--------->
+                    <!-- 投稿一覧 -->
                     <div class="user-posts">
                         <h3>投稿一覧</h3>
                         <?php while ($post_row = $post_stmt->fetch()) : ?>
                             <div class="user-post">
-                                <!-----アイコン----->
+                                <!-- アイコン -->
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>        
                                     <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
                                 <?php endif; ?>                                
-                                <!-----ユーザー名----->
+                                <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($post_row['user_id'])) ?></p>
                             </div>  
 
-                            <!-----投稿文----->
+                            <!-- 投稿文 -->
                             <p class="user-post-stmt"><?= h($post_row['content']) ?></p>
 
-                            <!-----画像------>
+                            <!-- 画像 -->
                             <?php if(isset($post_row['file_path'])) : ?>
                                 <p class="user-post-image"><img src="<?= h($post_row['file_path']) ?>" class="image"></p>  
                             <?php endif; ?>
 
-                            <!-----いいねの数----->
+                            <!-- いいねの数 -->
                             <p class=""><img src="images/heart.png"> <?= h(get_likes_number($post_row['post_id'])) ?></p>
 
-                            <!-----投稿日時----->
+                            <!-- 投稿日時 -->
                             <p><?= h($post_row['created_at']) ?></p>
                             
-                            <!-----ボタン---->
+                            <!-- ボタン -->
                             <div class="user-post-buttons">
                                 <ul class="user-post-btn-list">
-                                    <!-----返信ボタン---->
+                                    <!-- 返信ボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="reply_btn" value=<?= h($post_row['post_id']) ?>>  
                                         <li><input type="submit" value="返信" class="user-button"></li>
                                     </form>
                 
-                                    <!-----いいねボタン------>
-                                    <!--ログインユーザーのいいねをひとつずつを、投稿と照合する。合致したら「いいね解除」とする-->
+                                    <!-- いいねボタン -->
+                                    <!-- ログインユーザーのいいねをひとつずつを、投稿と照合する。合致したら「いいね解除」とする-->
                                     <?php $post_is_liked_id = get_likes($post_row['post_id']); ?>
                                     <form action="" method="post">
-                                        <!--$post_likeはforeach内で回されているので、$is_likedがfalseだった場合、最後尾の要素が使われる-->
+                                        <!--$post_likeはforeach内で回されているので、$is_likedがfalseだった場合、最後尾の要素が使われる -->
                                         <?php if ($post_is_liked_id) : ?>
                                             <input type="hidden" name="delete_like" value=<?= h($post_row['post_id']) ?>>
                                             <li><input type="submit" value="いいね解除" class="user-button"></li>
@@ -235,7 +235,7 @@ while ($block_row = $block_stmt->fetch()) {
                                         <?php endif; ?> 
                                     </form>
 
-                                    <!-----ブックマークボタン------>
+                                    <!-- ブックマークボタン -->
                                     <?php
                                     $post_bm_id = get_bookmarks($post_row['post_id']); ?>
                                     <form action="" method="post">
@@ -248,7 +248,7 @@ while ($block_row = $block_stmt->fetch()) {
                                         <?php endif; ?>                         
                                     </form>
 
-                                    <!-----削除ボタン------>
+                                    <!-- 削除ボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="delete_post" value=<?= h($post_row['post_id']) ?>> 
                                         <!--hiddenで$_POST['delete_post']=>$post_row['post_id']として値を渡すことができる-->
@@ -259,48 +259,45 @@ while ($block_row = $block_stmt->fetch()) {
                         <?php endwhile; ?> 
                     </div>
 
-                    <!---------返信一覧--------->
+                    <!-- 返信一覧 -->
                     <div class="user-replies">
                         <h3>返信一覧</h3>
                         <?php while ($reply_row = $reply_stmt->fetch()) : ?>
                             <div class="user-reply">
-                                <!-----アイコン----->
-                                <?php
-                                $icon_stmt = get_icon($reply_row['user_id']);
-                                $icon_row = $icon_stmt->fetch();
-                                ?>
+                                <!-- アイコン -->
+                                <?php $icon_row = get_icon($reply_row['user_id']) ?>
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>        
                                     <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
                                 <?php endif; ?>
-                                <!-----ユーザー名----->
+                                <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($reply_row['user_id'])) ?></p>
                             </div>
 
-                            <!-----投稿文----->
+                            <!-- 投稿文 -->
                             <p class="user-post-stmt"><?= h($reply_row['content']) ?></p>
-                            <!-----画像------>
+                            <!-- 画像------>
                             <?php if(isset($reply_row['file_path'])) : ?>
                                 <p><img src="<?= h($reply_row['file_path']) ?>" class="image"></p>
                             <?php endif; ?> 
                             
-                            <!-----いいねの数----->
+                            <!-- いいねの数 -->
                             <p class=""><img src="images/heart.png"> <?= h(get_rep_likes_number($reply_row['reply_id'])) ?></p>
 
-                            <!-----投稿日時----->
+                            <!-- 投稿日時 -->
                             <p><?= h($reply_row['created_at']) ?></p>
 
-                            <!-----ボタン---->
+                            <!-- ボタン -->
                             <div class="user-reply-buttons">
                                 <ul class="user-reply-btn-list">
-                                    <!-----返信ボタン---->
+                                    <!-- 返信ボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="reply_btn" value=<?= h($reply_row['post_id']) ?>>  
                                         <li><input type="submit" value="返信" class="user-button"></li>
                                     </form>
 
-                                    <!-----いいねボタン------>
+                                    <!-- いいねボタン -->
                                     <?php $post_is_liked_id = get_rep_likes($reply_row['reply_id']) ?>
                                     <form action="" method="post">
                                         <?php if ($post_is_liked_id) : ?>
@@ -312,7 +309,7 @@ while ($block_row = $block_stmt->fetch()) {
                                         <?php endif; ?> 
                                     </form>
 
-                                    <!-----ブックマークボタン------>
+                                    <!-- ブックマークボタン -->
                                     <?php $reply_bm_id = get_rep_bookmarks($reply_row['reply_id']) ?>
                                     <form action="" method="post">
                                         <?php if ($reply_bm_id) : ?>
@@ -323,7 +320,7 @@ while ($block_row = $block_stmt->fetch()) {
                                             <li><button type="submit">ブックマーク</button></li>
                                         <?php endif; ?>                         
                                     </form>
-                                    <!-----削除ボタン------>
+                                    <!-- 削除ボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="delete_reply" value=<?= h($reply_row['reply_id']) ?>> 
                                         <li><input type="submit" value="削除" class="user-button"></li>
@@ -332,7 +329,7 @@ while ($block_row = $block_stmt->fetch()) {
                             </div>    
                         <?php endwhile; ?>       
 
-                    <!---------いいね一覧---------->
+                    <!-- いいね一覧 -->
                     <div class="user-goods">
                         <h3>いいね一覧</h3>
                         <?php
@@ -349,51 +346,48 @@ while ($block_row = $block_stmt->fetch()) {
                             if ($block_like) :
                         ?>
                                 <div class="user-good">
-                                    <!-----アイコン----->
-                                    <?php
-                                    $icon_stmt = get_icon($post_like_rep['user_id']);
-                                    $icon_row = $icon_stmt->fetch();
-                                    ?>
+                                    <!-- アイコン -->
+                                    <?php $icon_row = get_icon($post_like_rep['user_id']) ?>
                                     <?php if (empty($icon_row)) : ?>
                                         <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                     <?php else : ?>        
                                         <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
                                     <?php endif; ?>                                    
-                                    <!-----ユーザー名----->
+                                    <!-- ユーザー名 -->
                                     <p class="user-username"><?= h(get_user_name($post_like_rep['user_id'])) ?></p>
                                 </div>
 
-                                <!-----投稿文----->
+                                <!-- 投稿文 -->
                                 <?php if (isset($post_like_rep['reply_id'])) : ?>  
                                     <p class="user-post-stmt">RE: <?= h($post_like_rep['content']) ?></p>
                                 <?php else : ?>
                                     <p class="user-post-stmt"><?= h($post_like_rep['content']) ?></p>
                                 <?php endif; ?>
-                                <!-----画像------>
+                                <!-- 画像 -->
                                 <?php if(isset($post_like_rep['file_path'])) : ?>
                                     <p><img src="<?= h($post_like_rep['file_path']) ?>" class="image"></p>
                                 <?php endif; ?> 
                                 
-                                <!-----いいねの数----->
+                                <!-- いいねの数 -->
                                 <?php if (isset($post_like_rep['reply_id'])) : ?>
                                     <p class=""><img src="images/heart.png"> <?= h(get_rep_likes_number($post_like_rep['reply_id'])) ?></p>
                                 <?php else : ?>
                                     <p class=""><img src="images/heart.png"> <?= h(get_likes_number($post_like_rep['post_id'])) ?></p>
                                 <?php endif; ?>
 
-                                <!-----投稿日時----->
+                                <!-- 投稿日時 -->
                                 <p><?= h($post_like_rep['created_at']) ?></p>
 
-                                <!-----ボタン---->
+                                <!-- ボタン -->
                                 <div class="user-good-buttons">
                                     <ul class="user-good-btn-list">
-                                        <!-----返信ボタン---->
+                                        <!-- 返信ボタン -->
                                         <form action="" method="post">
                                             <input type="hidden" name="reply_btn" value=<?= h($post_like_rep['post_id']) ?>>  
                                             <li><input type="submit" value="返信" class="user-button"></li>
                                         </form>
 
-                                        <!-----アカウントボタン----->
+                                        <!-- アカウントボタン -->
                                         <?php if ($post_like_rep['user_id'] != $_SESSION['login']['member_id']) : ?>
                                         <form action="" method="post">
                                             <input type="hidden" name="user_page" value=<?= h($post_like_rep['user_id']) ?>>
@@ -401,7 +395,7 @@ while ($block_row = $block_stmt->fetch()) {
                                         </form>
                                         <?php endif ?>
 
-                                        <!-----いいねボタン------>
+                                        <!-- いいねボタン -->
                                         <?php if (isset($post_like_rep['reply_id'])) : ?>
                                             <form action="" method="post">
                                                 <input type="hidden" name="delete_reply_like" value=<?= h($post_like_rep['reply_id']) ?>>
@@ -414,8 +408,8 @@ while ($block_row = $block_stmt->fetch()) {
                                             </form>
                                         <?php endif; ?>
 
-                                        <!-----ブックマークボタン------>
-                                        <!-----返信に対するブックマークボタン------>
+                                        <!-- ブックマークボタン -->
+                                        <!-- 返信に対するブックマークボタン -->
                                         <?php if (isset($post_like_rep['reply_id'])) : ?>
                                             <?php $reply_bm_id = get_rep_bookmarks($post_like_rep['reply_id']) ?>
                                             <form action="" method="post">
@@ -428,7 +422,7 @@ while ($block_row = $block_stmt->fetch()) {
                                                 <?php endif; ?>                         
                                             </form>
                                         <?php else : ?>
-                                            <!-----投稿に対するブックマークボタン------>
+                                            <!-- 投稿に対するブックマークボタン -->
                                             <?php
                                             $post_bm_id = get_bookmarks($post_like_rep['post_id']) ?>
                                             <form action="" method="post">
@@ -442,16 +436,16 @@ while ($block_row = $block_stmt->fetch()) {
                                             </form>
                                         <?php endif; ?>
 
-                                        <!-----削除ボタン------>
-                                        <!---ログインユーザーの投稿or返信いいねのみ表示する------>
+                                        <!-- 削除ボタン -->
+                                        <!-- ログインユーザーの投稿or返信いいねのみ表示する -->
                                         <?php if ($post_like_rep['user_id'] === $_SESSION['login']['member_id']) : ?>
-                                            <!-----返信に対する削除ボタン------>
+                                            <!-- 返信に対する削除ボタン-->
                                             <?php if (isset($post_like_rep['reply_id'])) : ?>
                                                 <form action="" method="post">
                                                     <input type="hidden" name="delete_reply" value=<?= h($post_like_rep['reply_id']) ?>>
                                                     <li><input type="submit" value="削除" class="user-button"></li>
                                                 </form>
-                                            <!-----投稿に対する削除ボタン------>            
+                                            <!-- 投稿に対する削除ボタン -->            
                                             <?php else : ?>
                                                 <form action="" method="post">
                                                     <input type="hidden" name="delete_post" value=<?= h($post_like_rep['post_id']) ?>>
@@ -464,13 +458,13 @@ while ($block_row = $block_stmt->fetch()) {
                             <?php endif; ?> 
                         <?php endforeach; ?> 
 
-                    <!---------フォロー一覧---------->
+                    <!-- フォロー一覧 -->
                     <div class="user-follows">
                         <h3>フォロー一覧</h3>
                         <?php $follows = get_follow($_SESSION['login']['member_id']) ?>
                         <?php foreach ($follows as $follow) : ?>
                             <div class="user-follow">
-                                <!-----アイコン----->
+                                <!-- アイコン -->
                                 <?php
                                 $icon_stmt = get_icon($follow['is_followed']);
                                 $icon_row = $icon_stmt->fetch();
@@ -480,19 +474,19 @@ while ($block_row = $block_stmt->fetch()) {
                                 <?php else : ?>        
                                     <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
                                 <?php endif; ?>                                
-                                <!-----ユーザー名----->
+                                <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($follow['is_followed'])) ?></p>
                             </div>
 
-                            <!-----ボタン----->
+                            <!-- ボタン -->
                             <div class="user-follow-buttons">
                                 <ul class="user-follow-btn-list">
-                                    <!-----アカウントボタン----->
+                                    <!-- アカウントボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="user_page" value=<?= h($follow['is_followed']) ?>>
                                         <li><input type="submit" value="アカウント" class="user-button"></li>
                                     </form>
-                                    <!-----フォロー解除----->
+                                    <!-- フォロー解除 -->
                                     <form action="" method="post">
                                         <input type="hidden" name="delete_follow" value=<?= h($follow['is_followed']) ?>>
                                         <li><input type="submit" value="フォロー解除" class="user-button"></li>
@@ -502,12 +496,12 @@ while ($block_row = $block_stmt->fetch()) {
                         <?php endforeach; ?> 
                     </div>
 
-                    <!---------フォロワー一覧--------->
+                    <!-- フォロワー一覧 -->
                     <div class="user-followers">
                         <h3>フォロワー一覧</h3>
                         <?php while ($is_followed_row = $is_followed_stmt->fetch()) : ?>
                             <div class="user-follower">
-                                <!-----アイコン----->
+                                <!-- アイコン -->
                                 <?php 
                                 $icon_stmt = get_icon($is_followed_row['follow']);
                                 $icon_row = $icon_stmt->fetch();
@@ -517,19 +511,19 @@ while ($block_row = $block_stmt->fetch()) {
                                 <?php else : ?>        
                                     <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
                                 <?php endif; ?>                                
-                                <!-----ユーザー名----->
+                                <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($is_followed_row['follow'])) ?></p>
                             </div>
 
-                            <!-----ボタン----->
+                            <!-- ボタン -->
                             <div class="user-follower-buttons">
                                 <ul class="user-follower-btn-list">    
-                                    <!-----アカウントボタン----->
+                                    <!-- アカウントボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="user_page" value=<?= h($is_followed_row['follow']) ?>>
                                         <li><input type="submit" value="アカウント" class="user-button"></li>
                                     </form>
-                                    <!-----フォロー、アンフォロー----->
+                                    <!-- フォロー、アンフォロー -->
                                     <form action="" method="post">
                                         <?php
                                         $is_followed = false;

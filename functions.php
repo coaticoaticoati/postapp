@@ -30,7 +30,7 @@ function insert_post($content) {
     $sql = 'INSERT INTO posts (user_id, content, file_name, file_path) 
     VALUES (:user_id, :content, NULL, NULL)';
     $post_ins_stmt = $dbh->prepare($sql);
-    $post_ins_stmt->bindValue(':content', $content); //プレースホルダーに変数を代入
+    $post_ins_stmt->bindValue(':content', $content);
     $post_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id']);
     $post_ins_stmt->execute();
 }
@@ -56,7 +56,8 @@ function get_posts($get_posts) {
     $post_stmt = $dbh->prepare($sql);
     $post_stmt->bindValue(':post_id', $get_posts, PDO::PARAM_INT);
     $post_stmt->execute();
-    return $post_stmt;
+    $post_row = $post_stmt->fetch();
+    return $post_row;
 }
 
 // データベースから対象ユーザーの投稿を取得
@@ -271,7 +272,8 @@ function get_rep_likes($get_rep_likes) {
 // ログインユーザーの、投稿と返信のいいねを取得
 function get_likes_reps() {
     $dbh = db_open();
-    $sql = 'SELECT post_id, pressed_at, created_at, content, posts.user_id, posts.file_path, post_is_liked_id FROM likes
+    $sql = 'SELECT post_id, pressed_at, created_at, content, posts.user_id, posts.file_path, post_is_liked_id 
+    FROM likes
     INNER JOIN posts ON likes.post_is_liked_id = posts.post_id 
     WHERE likes.user_id = :user_id';
     $post_like_stmt = $dbh->prepare($sql);
@@ -379,6 +381,32 @@ function get_rep_bookmarks($get_rep_bookmarks) {
     return $reply_bm_id;
 }
 
+// カテゴリー名を登録
+function insert_category_name($insert_category_name) {
+    $dbh = db_open();
+    $sql = 'INSERT INTO categories (user_id, name)
+    VALUES (:user_id, :name)';
+    $category_ins_stmt = $dbh->prepare($sql);
+    $category_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $category_ins_stmt->bindValue(':name', $insert_category_name, PDO::PARAM_STR);
+    $category_ins_stmt->execute();
+}
+
+// カテゴリー名を取得
+function get_category_names() {
+    $dbh = db_open();
+    $sql ='SELECT id, name FROM categories
+    WHERE user_id = :user_id
+    ORDER BY created_at ASC';
+    $category_name_stmt = $dbh->prepare($sql);
+    $category_name_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $category_name_stmt->execute();
+    while ($category_name_row = $category_name_stmt->fetch()) { 
+        $category_names[] = $category_name_row;
+    }
+    return $category_names;
+}
+
 // ----------フォロー、フォロワー、アンフォロー-------
 
 // フォロー登録
@@ -458,7 +486,8 @@ function get_block_user($get_block_user) {
     $block_stmt->bindValue(':block', $_SESSION['login']['member_id'], PDO::PARAM_INT);
     $block_stmt->bindValue(':is_blocked', $get_block_user, PDO::PARAM_INT);
     $block_stmt->execute();
-    return $block_stmt;
+    $block_user = $block_stmt->fetch();
+    return $block_user;
 }
 
 // ログインユーザーが参照中ユーザーにブロックされてる情報を取得
@@ -470,7 +499,8 @@ function get_blocked_user($get_blocked_user) {
     $is_blocked_stmt->bindValue(':block', $get_blocked_user, PDO::PARAM_INT);
     $is_blocked_stmt->bindValue(':is_blocked', $_SESSION['login']['member_id'], PDO::PARAM_INT);
     $is_blocked_stmt->execute();
-    return $is_blocked_stmt;
+    $blocked_user = $is_blocked_stmt->fetch();
+    return $blocked_user;
 }
 
 // ------アイコン、プロフィール------

@@ -1,5 +1,5 @@
 <?php
-ini_set("display_errors", "OFF");
+// ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 
@@ -15,7 +15,6 @@ if (isset($_POST['update_name'])) {
     $post_stmt->execute();
     $_SESSION['login']['name'] = $_POST['update_name'];
 }
-
 
 // -------アイコン------
 
@@ -62,9 +61,7 @@ if (isset($_FILES['image'])) {
     }
 }
 
-// アイコンを取得
-$icon_stmt = get_icon($_SESSION['login']['member_id']);
-$icon_row = $icon_stmt->fetch();
+$icon_row = get_icon($_SESSION['login']['member_id']);
 
 // アイコンを削除
 if (isset($_POST['delete_icon'])) {
@@ -93,10 +90,6 @@ if (isset($_POST['insert_profile'])) {
         $pro_ins_stmt->execute();
     }
 }
-
-// プロフィール文を取得
-$profile_stmt = get_profile($_SESSION['login']['member_id']);
-$profile_row = $profile_stmt->fetch();
 
 // プロフィール文を削除
 if (isset($_POST['delete_profile'])) {
@@ -139,7 +132,7 @@ if (isset($_POST['delete_profile'])) {
                     <!-----アイコンを編集----->
                     <div class="edit-icon">
                         <h3>アイコンを編集</h3>
-                        <P><img src="<?= h($icon_row['file_path']) ?>"></P>
+                        <P><img src="<?= h(get_icon($_SESSION['login']['member_id'])) ?>"></P>
                         <form action="" method="post" enctype="multipart/form-data">    
                             <input type="hidden" name="MAX_FILE_SIZE" value="1048576"><!-----ファイルの最大サイズを指定----->
                             <input type="file" name="image" accept="image/*">
@@ -176,7 +169,7 @@ if (isset($_POST['delete_profile'])) {
                         <h3>プロフィール文を編集</h3>
                         <div class="profile-form">
                             <form action="" method="post">    
-                                <textarea name="insert_profile" class="profile-box"><?= h($profile_row['profile_content']) ?></textarea>
+                                <textarea name="insert_profile" class="profile-box"><?= h(get_profile($_SESSION['login']['member_id'])) ?></textarea>
                                 <div><button type="submit">送信</button></div>
                             </form>
                         </div>

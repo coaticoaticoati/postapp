@@ -76,13 +76,13 @@ while ($block_row = $block_stmt->fetch()) {
         <main>
             <div class="users-list">
                 <div class="container">
-                    <!--ユーザー一覧を表示し、フォローしているかどうかでボタンの表示を変える-->
+                    <!-- ユーザー一覧を表示し、フォローしているかどうかでボタンの表示を変える-->
                     <?php while ($member_row = $members_stmt->fetch()) : ?>
                         <?php // $member_rowのうち、ログインユーザーであるものはスキップする
                         if ($member_row['member_id'] === $_SESSION['login']['member_id']) { 
                             continue;
                         } ?>
-                        <!---アイコン----->
+                        <!-- アイコン -->
                         <?php 
                         $icon_row = get_icon($member_row['member_id']);
                         ?>
@@ -92,22 +92,22 @@ while ($block_row = $block_stmt->fetch()) {
                             <p class="users-list-icon"><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
                         <?php endif; ?>
 
-                        <!---ユーザー名----->
+                        <!-- ユーザー名 -->
                         <p class="users-list-username"><?= h($member_row['name']) ?></p>
 
-                        <!---プロフィール----->
+                        <!-- プロフィール -->
                         <?php $profile_row = get_profile($member_row['member_id']) ?>
                         <p><?= h($profile_row['profile_content']) ?></p>
 
                         <div class="users-list-buttons">
                             <ul class="users-list-btn-list">
-                                <!-----アカウントボタン------>
+                                <!-- アカウントボタン -->
                                 <form action="" method="post">
                                     <input type="hidden" name="user_page" value=<?= h($member_row['member_id']) ?>>
                                     <li><button type="submit">アカウント</button></li>
                                 </form>
 
-                                <!-----フォローボタン------>
+                                <!-- フォローボタン -->
                                 <form action="" method="post">
                                     <?php // ブロックしている、されているか確認
                                     $block_like = true;
@@ -131,8 +131,8 @@ while ($block_row = $block_stmt->fetch()) {
                                         }
                                         ?>    
                                         <?php if ($is_following) : ?>
-                                            <!--一覧でフォローを外したいユーザーのidを渡す-->
-                                            <!--フォローしているユーザーには"フォロー解除"を表示-->
+                                            <!-- 一覧でフォローを外したいユーザーのidを渡す -->
+                                            <!-- フォローしているユーザーには"フォロー解除"を表示 -->
                                             <input type="hidden" name="delete_follow" value=<?= h($member_row['member_id']) ?>>
                                             <li><button type="submit">フォロー解除</button></li>
                                         <?php else : ?>
