@@ -1,5 +1,5 @@
 <?php
-ini_set("display_errors", "OFF");
+// ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 
@@ -157,16 +157,14 @@ $following_user_list = get_follow($_SESSION['login']['member_id']);
 // ブロック情報を取得
 
 // ログインユーザーが参照中ユーザーをブロックしているか確認し、していればblock.phpへ
-$block_stmt = get_block_user($_SESSION['other_user']);
-$block_user = $block_stmt->fetch();
+$block_user = get_block_user($_SESSION['other_user']);
 if (!empty($block_user)) {
     header('Location: block.php');
     exit;   
 }
 
 // ログインユーザーが参照中ユーザーにブロックされてるか確認し、されていればblock.phpへ
-$is_blocked_stmt = get_blocked_user($_SESSION['other_user']);
-$blocked_user = $is_blocked_stmt->fetch();
+$blocked_user = get_blocked_user($_SESSION['other_user']);
 if (!empty($blocked_user)) {
     header('Location: block.php');
     exit;   
@@ -219,7 +217,8 @@ if (isset($_POST['block_user'])) {
             <div class="navbar-list">
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
-                    <li><a href="user.php">プロフィール</a></li>
+                    <li><a href="bookmark.php">ブックマーク</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -236,7 +235,7 @@ if (isset($_POST['block_user'])) {
                             <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
                         <?php endif; ?>
                         <!-- ユーザー名 -->
-                        <h3><?= h($user_name_row['name']) ?></h3>
+                        <h3><?= h(get_user_name($_SESSION['other_user'])) ?></h3>
                         <!-- プロフィール文 -->
                         <p><?= h($profile_row['profile_content']) ?></p>
                         <div class="follow-block">

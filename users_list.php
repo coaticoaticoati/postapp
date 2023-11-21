@@ -1,5 +1,5 @@
 <?php
-// ini_set("display_errors", "OFF");
+ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 
@@ -67,7 +67,8 @@ while ($block_row = $block_stmt->fetch()) {
             <div class="navbar-list">
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
-                    <li><a href="user.php">プロフィール</a></li>
+                    <li><a href="bookmark.php">ブックマーク</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -101,23 +102,22 @@ while ($block_row = $block_stmt->fetch()) {
 
                         <div class="users-list-buttons">
                             <ul class="users-list-btn-list">
-                                <!-- アカウントボタン -->
-                                <form action="" method="post">
-                                    <input type="hidden" name="user_page" value=<?= h($member_row['member_id']) ?>>
-                                    <li><button type="submit">アカウント</button></li>
-                                </form>
-
-                                <!-- フォローボタン -->
-                                <form action="" method="post">
+                                
+                                <!-- ボタン -->
+                                
                                     <?php // ブロックしている、されているか確認
                                     $block_like = true;
                                     foreach ($blocks as $block) {
-                                        if ($block['is_blocked'] === $member_row['member_id'] ) {
+                                        if ($block['is_blocked'] === $member_row['member_id']) {
                                             $block_like = false;
                                         }
                                     }
+                                    // ブロックしている、されている場合
                                     if ($block_like === false) { ?>
-                                        <li><button type="submit">ブロック</button></li>
+                                        <form action="" method="post">
+                                            <input type="hidden" name="user_page" value=<?= h($member_row['member_id']) ?>>
+                                            <li><button type="submit">ブロック中</button></li>
+                                        </form>    
                                     <?php }
                                     // ブロックしていない、されていない場合
                                     if ($block_like) :
@@ -129,18 +129,22 @@ while ($block_row = $block_stmt->fetch()) {
                                                 // $is_followingがtrueになった時点でbreakを入れてループを抜け、以降の不要なループ処理を省略するようにする
                                             }
                                         }
-                                        ?>    
-                                        <?php if ($is_following) : ?>
-                                            <!-- 一覧でフォローを外したいユーザーのidを渡す -->
-                                            <!-- フォローしているユーザーには"フォロー解除"を表示 -->
-                                            <input type="hidden" name="delete_follow" value=<?= h($member_row['member_id']) ?>>
-                                            <li><button type="submit">フォロー解除</button></li>
-                                        <?php else : ?>
-                                            <input type="hidden" name="insert_follow" value=<?= h($member_row['member_id']) ?>>
-                                            <li><button type="submit">フォローする</button></li>
-                                        <?php endif; ?> 
+                                        ?>
+                                        <!-- アカウントボタン -->
+                                        <li><button type="submit"><a href="user.php?id=<?= h($member_row['member_id']) ?>">アカウント</a></button></li>
+                                        
+                                        <!-- フォローボタン -->
+                                        <form action="" method="post">        
+                                            <?php if ($is_following) : ?>
+                                                <input type="hidden" name="delete_follow" value=<?= h($member_row['member_id']) ?>>
+                                                <li><button type="submit">フォロー解除</button></li>
+                                            <?php else : ?>
+                                                <input type="hidden" name="insert_follow" value=<?= h($member_row['member_id']) ?>>
+                                                <li><button type="submit">フォローする</button></li>
+                                            <?php endif; ?>
+                                        </form>         
                                     <?php endif; ?>     
-                                </form>
+                                
                             </ul>
                         </div>   
                     <?php endwhile; ?> 

@@ -6,6 +6,10 @@ session_start();
 // データベース接続
 $dbh = db_open(); 
 
+
+//
+$user_id = (int)$_GET['id'];
+
 // ブロック解除が押された場合
 
 // データベース削除
@@ -13,9 +17,9 @@ if (isset($_POST['unblock_user'])) {
     $sql = 'DELETE FROM blocks WHERE block = :block AND is_blocked = :is_blocked';
     $block_del_stmt = $dbh->prepare($sql);
     $block_del_stmt->bindValue(':block', $_SESSION['login']['member_id'], PDO::PARAM_INT);
-    $block_del_stmt->bindValue(':is_blocked', $_SESSION['other_user'], PDO::PARAM_INT);
+    $block_del_stmt->bindValue(':is_blocked', $user_id, PDO::PARAM_INT);
     $block_del_stmt->execute();
-    header('Location: other_user.php');
+    header('Location: user.php?id='.$user_id);
     exit;
 }
 
@@ -24,7 +28,7 @@ if (isset($_POST['unblock_user'])) {
 <html lang="ja">
     <head>
         <meta charset="utf-8">
-        <title><?= h(get_user_name($_SESSION['other_user'])) ?>さんのプロフィール</title>
+        <title>ブロック</title>
         <link rel="stylesheet" href="stylesheet.css">
     </head>
     <body>
@@ -33,7 +37,8 @@ if (isset($_POST['unblock_user'])) {
             <div class="navbar-list">
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
-                    <li><a href="user.php">プロフィール</a></li>
+                    <li><a href="bookmark.php">ブックマーク</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -44,19 +49,19 @@ if (isset($_POST['unblock_user'])) {
                 <div class="container">
                     <?php
                     // ログインユーザーが参照中ユーザーをブロックしている、ログインユーザーが参照中ユーザーにブロックされてるか確認
-                    $block_user = get_block_user($_SESSION['other_user']);
-                    $blocked_user = get_blocked_user($_SESSION['other_user']);
+                    $block_user = get_block_user($user_id);
+                    $blocked_user = get_blocked_user($user_id);
 
                     // ブロックしているか、されているかで表示を変える
                     if (!empty($block_user)) :
                     ?>
                         <form action="" method="post">
-                            <input type="hidden" name="unblock_user" value=<?= h($_SESSION['other_user']) ?>>  
-                            <h4><?= h(get_user_name($_SESSION['other_user'])) ?>さんをブロックしています。ブロックを解除しますか。</h4>
+                            <input type="hidden" name="unblock_user" value=<?= h($user_id) ?>>  
+                            <h4><?= h(get_user_name($user_id)) ?>さんをブロックしています。ブロックを解除しますか。</h4>
                             <button type="submit">解除する</button>
                         </form>
                     <?php elseif (!empty($blocked_user)) : ?>
-                        <h4><?= h(get_user_name($_SESSION['other_user'])) ?>さんはあなたをブロックしています。</h4>
+                        <h4><?= h(get_user_name($user_id)) ?>さんはあなたをブロックしています。</h4>
                     <?php endif; ?>  
                 </div>
             </div>

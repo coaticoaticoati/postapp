@@ -1,17 +1,10 @@
 <?php
-ini_set("display_errors", "OFF");
+// ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 
 // データベース接続
 $dbh = db_open();
-
-// アカウントボタンが押された場合
-if (isset($_POST['user_page'])) {
-    $_SESSION['other_user'] = (int)$_POST['user_page'];
-    header('Location: other_user.php');
-    exit;
-}
 
 // 返信ボタンが押された場合
 if (isset($_POST['reply_btn'])) {
@@ -32,13 +25,13 @@ if (isset($_POST['search'])) {
     // 検索ワードの数だけ$search_wordsを作り、検索ワードひとつずつを$search_arrayに格納
     foreach ($explode_words as $explode_word) {
         $search_post[] = '(posts.content LIKE ? OR members.name LIKE ?)';
-        $search_profile[] = '(members.name LIKE ? OR profile.profile_content LIKE ?)';
+        $search_profile[] = '(members.name LIKE ? OR profiles.profile_content LIKE ?)';
         $search_array[] = '%'.$explode_word.'%';
         $search_array[] = '%'.$explode_word.'%';
     }
 
     // 投稿内容とユーザー名を検索
-    $sql = 'SELECT post_id, content, posts.created_at, user_id, file_path, name FROM members 
+    $sql = 'SELECT post_id, content, posts.created_at, members.member_id, file_path, name FROM members 
             LEFT OUTER JOIN posts ON members.member_id = posts.user_id
             WHERE'. implode(' AND ', $search_post). 
             'ORDER BY posts.created_at DESC';
@@ -49,8 +42,8 @@ if (isset($_POST['search'])) {
     }
 
     // ユーザー名とプロフィール文を検索
-    $sql = 'SELECT name, profile_content, user_id, members.created_at FROM members
-            LEFT OUTER JOIN profile ON members.member_id = profile.user_id
+    $sql = 'SELECT name, profile_content, members.member_id, members.created_at FROM members
+            LEFT OUTER JOIN profiles ON members.member_id = profiles.user_id
             WHERE'. implode(' AND ', $search_profile). 
             'ORDER BY members.created_at DESC';
     $search_prof_stmt = $dbh->prepare($sql);
@@ -123,7 +116,8 @@ while ($block_row = $block_stmt->fetch()) {
             <div class="navbar-list">
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
-                    <li><a href="user.php">プロフィール</a></li>
+                    <li><a href="bookmark.php">ブックマーク</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -147,7 +141,7 @@ while ($block_row = $block_stmt->fetch()) {
                                 // ブロックしている、されている場合、false となり、検索結果を表示しない
                                 $block_search = true;
                                 foreach ($blocks as $block) {
-                                    if ($block['is_blocked'] === $search_post['user_id']) {
+                                    if ($block['is_blocked'] === $search_post['member_id']) {
                                         $block_search = false;
                                     }
                                 }  // $block_search が true の場合、検索結果を表示する
@@ -155,7 +149,7 @@ while ($block_row = $block_stmt->fetch()) {
                             ?>      
                                     <!-- アイコン -->
                                     <div>      
-                                        <?php $icon_row = get_icon($search_post['user_id']) ?>
+                                        <?php $icon_row = get_icon($search_post['member_id']) ?>
                                         <?php if (empty($icon_row)) : ?>
                                             <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                         <?php else : ?>        
@@ -165,7 +159,7 @@ while ($block_row = $block_stmt->fetch()) {
 
                                     <!-- ユーザー名 -->
                                     <div class="search-username">
-                                        <p><?= h(get_user_name($search_post['user_id'])) ?></p>
+                                        <p><?= h(get_user_name($search_post['member_id'])) ?></p>
                                     </div>
 
                                     <!-- 投稿文 -->
@@ -197,11 +191,8 @@ while ($block_row = $block_stmt->fetch()) {
                                             </form>
                                     
                                             <!-- アカウントボタン -->
-                                            <form action="" method="post">
-                                                <input type="hidden" name="user_page" value=<?= h($search_post['user_id']) ?>>
-                                                <li><button type="submit">アカウント</button></li>
-                                            </form>
-                                    
+                                            <li><button type="submit"><a href="user.php?id=<?= h($search_post['member_id']) ?>">アカウント</a></button></li>
+                                            
                                             <!-- いいねボタン -->
                                             <!-- 投稿に対するいいねボタン -->
                                             <form action="" method="post">
@@ -237,7 +228,7 @@ while ($block_row = $block_stmt->fetch()) {
                             
                                             <!-- 削除ボタン -->
                                             <!-- ログインユーザーの投稿のみ表示する -->            
-                                            <?php if($search_post['user_id'] === $_SESSION['login']['member_id']) : ?>
+                                            <?php if($search_post['member_id'] === $_SESSION['login']['member_id']) : ?>
                                                 <!-- 投稿に対する削除ボタン -->  
                                                 <form action="" method="post">
                                                     <input type="hidden" name="delete_post" value=<?= h($search_post['post_id']) ?>>
@@ -256,7 +247,7 @@ while ($block_row = $block_stmt->fetch()) {
                         <?php foreach ($search_prof_results as $search_prof) : ?> 
                             <!-- アイコン -->
                             <div>      
-                                <?php $icon_row = get_icon($search_prof['user_id']) ?>
+                                <?php $icon_row = get_icon($search_prof['member_id']) ?>
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>        
@@ -266,20 +257,18 @@ while ($block_row = $block_stmt->fetch()) {
 
                             <!-- ユーザー名 -->
                             <div class="search-username">
-                                <p><?= h(get_user_name($search_prof['user_id'])) ?></p>
+                                <p><?= h(get_user_name($search_prof['member_id'])) ?></p>
                             </div>  
 
                             <!-- プロフィール文 -->
                             <div>
-                                <p><?= h(get_profile($search_prof['user_id'])) ?></p>
+                                <p><?= h(get_profile($search_prof['member_id'])) ?></p>
                             </div>
 
                             <!-- アカウントボタン -->
                             <div class="search-buttons">
-                                <form action="" method="post">
-                                    <input type="hidden" name="user_page" value=<?= h($search_prof['user_id']) ?>>
-                                    <button type="submit" class="search-users-btn-account">アカウント</button>
-                                </form>
+                                <button type="submit" class="search-users-btn-account">
+                                    <a href="user.php?id=<?= h($search_prof['member_id']) ?>">アカウント</a></button>
                             </div>
                         <?php endforeach; ?>
                     </div>

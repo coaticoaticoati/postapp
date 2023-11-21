@@ -270,14 +270,14 @@ function get_rep_likes($get_rep_likes) {
 }
 
 // ログインユーザーの、投稿と返信のいいねを取得
-function get_likes_reps() {
+function get_likes_reps($get_likes_reps) {
     $dbh = db_open();
     $sql = 'SELECT post_id, pressed_at, created_at, content, posts.user_id, posts.file_path, post_is_liked_id 
     FROM likes
     INNER JOIN posts ON likes.post_is_liked_id = posts.post_id 
     WHERE likes.user_id = :user_id';
     $post_like_stmt = $dbh->prepare($sql);
-    $post_like_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $post_like_stmt->bindValue(':user_id', $get_likes_reps, PDO::PARAM_INT);
     $post_like_stmt->execute();
     while ($post_like_row = $post_like_stmt->fetch()) { 
         $post_likes_reps[] = $post_like_row;
@@ -287,7 +287,7 @@ function get_likes_reps() {
     INNER JOIN replies ON reply_likes.reply_is_liked_id = replies.reply_id 
     WHERE reply_likes.user_id = :user_id';
     $reply_like_stmt = $dbh->prepare($sql);
-    $reply_like_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $reply_like_stmt->bindValue(':user_id', $get_likes_reps, PDO::PARAM_INT);
     $reply_like_stmt->execute();
     while ($reply_like_row = $reply_like_stmt->fetch()) { 
         $post_likes_reps[] = $reply_like_row;
@@ -506,9 +506,9 @@ function get_blocked_user($get_blocked_user) {
 // ------アイコン、プロフィール------
 
 // アイコンをデータベースに追加、あれば更新
-function insert_icon($file_name, $save_path) {
+function insert_icons($file_name, $save_path) {
     $dbh = db_open();
-    $sql = 'INSERT INTO icon (file_name, file_path, user_id)
+    $sql = 'INSERT INTO icons (file_name, file_path, user_id)
     VALUES (:file_name, :file_path, :user_id) ON DUPLICATE KEY UPDATE 
     file_name = VALUES (file_name), file_path = VALUES (file_path)';
     $icon_ins_stmt = $dbh->prepare($sql);
@@ -521,7 +521,7 @@ function insert_icon($file_name, $save_path) {
 // アイコンの取得
 function get_icon($get_icon) {
     $dbh = db_open();
-    $sql ='SELECT file_path FROM icon WHERE user_id = :user_id';
+    $sql ='SELECT file_path FROM icons WHERE user_id = :user_id';
     $icon_stmt = $dbh->prepare($sql);
     $icon_stmt->bindValue(':user_id', $get_icon, PDO::PARAM_INT);
     $icon_stmt->execute();
@@ -532,7 +532,7 @@ function get_icon($get_icon) {
 // アイコンの削除
 function delete_icon($delete_icon) {
     $dbh = db_open();
-    $sql = 'DELETE FROM icon WHERE user_id = :user_id';
+    $sql = 'DELETE FROM icons WHERE user_id = :user_id';
     $icon_del_stmt = $dbh->prepare($sql);
     $icon_del_stmt->bindValue(':user_id', $delete_icon, PDO::PARAM_INT);
     $icon_del_stmt->execute();
@@ -541,8 +541,8 @@ function delete_icon($delete_icon) {
 // プロフィール文の取得
 function get_profile($get_profile) {
     $dbh = db_open();
-    $sql ='SELECT profile.profile_content, members.name 
-    FROM profile INNER JOIN members ON profile.user_id = members.member_id 
+    $sql ='SELECT profiles.profile_content, members.name 
+    FROM profiles INNER JOIN members ON profiles.user_id = members.member_id 
     WHERE member_id = :member_id';
     $profile_stmt = $dbh->prepare($sql);
     $profile_stmt->bindValue(':member_id', $get_profile, PDO::PARAM_INT);
@@ -554,7 +554,7 @@ function get_profile($get_profile) {
 // プロフィール文の削除
 function delete_profile($delete_profile) {
     $dbh = db_open();
-    $sql = 'DELETE FROM profile WHERE user_id = :user_id';
+    $sql = 'DELETE FROM profiles WHERE user_id = :user_id';
     $profile_del_stmt = $dbh->prepare($sql);
     $profile_del_stmt->bindValue(':user_id', $delete_profile, PDO::PARAM_INT);
     $profile_del_stmt->execute();

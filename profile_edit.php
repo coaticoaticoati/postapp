@@ -3,11 +3,13 @@
 require_once('functions.php');
 session_start();
 
+// データベース接続
+$dbh = db_open(); 
+
 // ----ユーザー名------
 
 // ユーザー名の更新
 if (isset($_POST['update_name'])) {
-    $dbh = db_open();
     $sql = 'UPDATE members SET name = :name WHERE member_id = :member_id';
     $post_stmt = $dbh->prepare($sql);
     $post_stmt->bindValue(':name', $_POST['update_name'], PDO::PARAM_STR);
@@ -80,8 +82,7 @@ if(strlen($_POST['profile_content']) > 200) {
 // プロフィール文をデータベースに追加、あれば更新
 if (isset($_POST['insert_profile'])) {
     if (!isset($error)) {
-        $dbh = db_open();
-        $sql = 'INSERT INTO profile (profile_content, user_id)
+        $sql = 'INSERT INTO profiles (profile_content, user_id)
         VALUES (:profile_content, :user_id) ON DUPLICATE KEY UPDATE 
         profile_content = VALUES (profile_content)';
         $pro_ins_stmt = $dbh->prepare($sql);
@@ -111,7 +112,8 @@ if (isset($_POST['delete_profile'])) {
             <div class="navbar-list">
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
-                    <li><a href="user.php">プロフィール</a></li>
+                    <li><a href="bookmark.php">ブックマーク</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -120,7 +122,7 @@ if (isset($_POST['delete_profile'])) {
         <main>
             <div class="edit">
                 <div class="container">   
-                    <!-----ユーザー名を編集----->
+                    <!-- ユーザー名を編集 -->
                     <div class="edit-user">
                         <h3>ユーザー名を編集</h3>
                         <form action="" method="post">    
@@ -129,7 +131,7 @@ if (isset($_POST['delete_profile'])) {
                         </form>
                     </div>
 
-                    <!-----アイコンを編集----->
+                    <!-- アイコンを編集 -->
                     <div class="edit-icon">
                         <h3>アイコンを編集</h3>
                         <P><img src="<?= h(get_icon($_SESSION['login']['member_id'])) ?>"></P>
@@ -139,7 +141,7 @@ if (isset($_POST['delete_profile'])) {
                             <button type="submit">送信</button> 
                         </form>
                         
-                        <!--エラーメッセージの表示-->
+                        <!-- エラーメッセージの表示 -->
                         <?php if ($error['file_size'] === 'over') : ?>
                             <p>ファイルサイズは1MB未満にしてください。</p>
                         <?php endif; ?>
@@ -156,7 +158,7 @@ if (isset($_POST['delete_profile'])) {
                             <p>画像ファイルをアップロードできませんでした。</p>
                         <?php endif; ?>
                     
-                    <!-----アイコンを削除----->
+                    <!-- アイコンを削除 -->
                     
                         <form action="" method="post">
                             <input type="hidden" name="delete_icon">
@@ -164,7 +166,7 @@ if (isset($_POST['delete_profile'])) {
                         </form>
                     </div>
 
-                    <!-----プロフィール文を編集----->
+                    <!-- プロフィール文を編集 -->
                     <div class="edit-profile-stmt">
                         <h3>プロフィール文を編集</h3>
                         <div class="profile-form">
@@ -183,11 +185,17 @@ if (isset($_POST['delete_profile'])) {
                             <p>200字以内で入力してください。</p>
                         <?php endif; ?>
                     </div>
-                    <!-----アカウント削除----->
+
+                    <!-- ブロック中のアカウントを表示するボタン -->
+                    <button><a href="block_account.php">ブロック中のアカウントを見る</a></button>
+
+
+                    <!-- アカウント削除 -->
                     <div class="delete_account">
                         <button><a href="account_delete.php">アカウントを削除する</a></button>
                     </div>
                 </div>
             </div>
         </main>
-    </body>        
+    </body>
+</html>            

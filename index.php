@@ -12,13 +12,6 @@ if (empty($_SESSION)) {
 // データベース接続
 $dbh = db_open();
 
-// アカウントボタンが押された場合
-if (isset($_POST['user_page'])) {
-    $_SESSION['other_user'] = (int)$_POST['user_page'];
-    header('Location: other_user.php');
-    exit;
-}
-
 // 投稿文の返信ボタンが押された場合
 if (isset($_POST['reply_btn_post'])) {
     $_SESSION['reply_btn'] = (int)$_POST['reply_btn_post'];
@@ -231,7 +224,7 @@ if (isset($_FILES['image'])) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -346,11 +339,8 @@ if (isset($_FILES['image'])) {
                                     <?php endif; ?>
 
                                     <!-- アカウントボタン -->
-                                    <form action="" method="post">
-                                        <input type="hidden" name="user_page" value=<?= h($post['user_id']) ?>>
-                                        <li><button type="submit">アカウント</button></li>
-                                    </form>
-
+                                        <li><button type="submit"><a href="user.php?id=<?= h($post['user_id']) ?>">アカウント</a></button></li>
+    
                                     <!-- いいねボタン -->
                                     <!-- 返信に対するいいねボタン -->
                                     <?php if (isset($post['reply_id'])) : ?>

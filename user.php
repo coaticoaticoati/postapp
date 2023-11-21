@@ -12,12 +12,11 @@ if (empty($_SESSION)) {
 // データベース接続
 $dbh = db_open();
 
-// アカウントボタンが押された場合
-if (isset($_POST['user_page'])) {
-    $_SESSION['other_user'] = (int)$_POST['user_page'];
-    header('Location: other_user.php');
-    exit;
-}
+// 
+$user_id = (int)$_GET['id'];
+$redirect_url = 'user.php?id='.$user_id;
+$redirect_block_url = 'block.php?id='.$user_id;
+
 
 // 返信ボタンが押された場合
 if (isset($_POST['reply_btn'])) {
@@ -30,95 +29,99 @@ if (isset($_POST['reply_btn'])) {
 // -----プロフィール------
 
 // アイコンを取得
-$icon_row = get_icon($_SESSION['login']['member_id']);
+$icon_row = get_icon($user_id);
 
 // 自分のプロフィール文を取得
-$profile_row = get_profile($_SESSION['login']['member_id']);
+$profile_row = get_profile($user_id);
 
 // -------投稿-------
 
 // データベースから自分の投稿を取得
-$post_stmt = get_user_posts($_SESSION['login']['member_id']);
+$post_stmt = get_user_posts($user_id);
 
 // いいねが押された場合
 if (isset($_POST['insert_like'])) {
     insert_like((int)$_POST['insert_like']);
-    header('Location: user.php');
+    header('Location:'. $redirect_url);
     exit;
 }
 
 // いいね解除ボタンが押された場合
 if (isset($_POST['delete_like'])) {
     delete_like((int)$_POST['delete_like']);
-    header('Location: user.php');
+    header('Location:'. $redirect_url);
     exit;
 }
 
 // 削除ボタンが押された場合
 if (isset($_POST['delete_post'])) {
     delete_post($_POST['delete_post']);
-    header('Location: user.php');
+    header('Location:'. $redirect_url);
     exit;
 }
 
 // ブックマークボタンが押された場合
 if (isset($_POST['insert_bm'])) {
     insert_bookmark((int)$_POST['insert_bm']);
-    header('Location: index.php');
+    header('Location:'. $redirect_url);
     exit;
 }
 
 // ブックマーク解除ボタンが押された場合
 if (isset($_POST['delete_bm'])) {
     delete_bookmark((int)$_POST['delete_bm']);
-    header('Location: index.php');
+    header('Location:'. $redirect_url);
     exit;
 }
-
 
 // -------返信-------
 
 // データベースから自分の返信を取得
-$reply_stmt = get_user_reply($_SESSION['login']['member_id']); 
+$reply_stmt = get_user_reply($user_id); 
 
 // いいねが押された場合
 if (isset($_POST['insert_reply_like'])) {
     insert_reply_like((int)$_POST['insert_reply_like']);
-    header('Location: user.php');
+    header('Location:'. $redirect_url);
     exit;
 }
 
 // いいね解除ボタンが押された場合
 if (isset($_POST['delete_reply_like'])) {
     delete_reply_like((int)$_POST['delete_reply_like']);
-    header('Location: user.php');
+    header('Location:'. $redirect_url);
     exit;
 }
 
 // 削除ボタンが押された場合
 if (isset($_POST['delete_reply'])) {
     delete_reply($_POST['delete_reply']);
-    header('Location: user.php');
+    header('Location:'. $redirect_url);
     exit;
-}
-
-// 投稿と返信をまとめた$post_likes_repsを日時順に並び変える
-if (isset($post_likes_reps)) {
-    array_multisort(array_map('strtotime', array_column($post_likes_reps, 'pressed_at')), SORT_DESC, $post_likes_reps) ;
 }
 
 // ブックマークボタンが押された場合
 if (isset($_POST['insert_reply_bm'])) {
     insert_rep_bookmark((int)$_POST['insert_reply_bm']);
-    header('Location: index.php');
+    header('Location:'. $redirect_url);
     exit;
 }
 
 // ブックマーク解除ボタンが押された場合
 if (isset($_POST['delete_reply_bm'])) {
     delete_rep_bookmark((int)$_POST['delete_reply_bm']);
-    header('Location: index.php');
+    header('Location:'. $redirect_url);
     exit;
+}
+
+// ----- いいね ------
+
+// ログインユーザーの、投稿と返信のいいねを取得
+$post_likes_reps = get_likes_reps($user_id);
+
+// 投稿と返信をまとめた$post_likes_repsを日時順に並び変える
+if (isset($post_likes_reps)) {
+    array_multisort(array_map('strtotime', array_column($post_likes_reps, 'pressed_at')), SORT_DESC, $post_likes_reps) ;
 }
 
 // ------フォロー、フォロワー-----
@@ -126,27 +129,81 @@ if (isset($_POST['delete_reply_bm'])) {
 // フォロー解除
 if (isset($_POST['delete_follow'])) {
     delete_follow((int)$_POST['delete_follow']);
-    header('Location: user.php');
+    header('Location:'. $redirect_url);
     exit; 
 }
 
 // フォロワー一覧を取得 
-$is_followed_stmt = get_follower($_SESSION['login']['member_id']);
+$is_followed_stmt = get_follower($user_id);
 
 // フォロー登録
 if (isset($_POST['insert_follow'])) {
     insert_follow((int)$_POST['insert_follow']);
-    header('Location: user.php');
+    header('Location:'. $redirect_url);
     exit;
 }
 
 // -------ブロック---------
+
+// ログインユーザーのページの場合
 
 // ログインユーザーがブロックしている、ログインユーザーをブロックしているユーザーを取得
 // いいね一覧に表示しないようにする
 $block_stmt = block_user();
 while ($block_row = $block_stmt->fetch()) {
     $blocks[] = $block_row;
+}
+
+// 他ユーザーのページの場合
+
+// ブロック情報を取得
+
+// ログインユーザーが参照中ユーザーをブロックしているか確認し、していればblock.phpへ
+$block_user = get_block_user($user_id);
+if (!empty($block_user)) {
+    header('Location:'.$redirect_block_url);
+    exit;   
+}
+
+// ログインユーザーが参照中ユーザーにブロックされてるか確認し、されていればblock.phpへ
+$blocked_user = get_blocked_user($user_id);
+if (!empty($blocked_user)) {
+    header('Location:'.$redirect_block_url);
+    exit;   
+}
+
+// ブロック登録ボタンが押された場合
+
+if (isset($_POST['block_user'])) {
+    // データベース登録
+    $sql = 'INSERT INTO blocks (block, is_blocked) 
+    VALUES (:block, :is_blocked)';
+    $block_ins_stmt = $dbh->prepare($sql);
+    $block_ins_stmt->bindValue(':block', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $block_ins_stmt->bindValue(':is_blocked', $_SESSION['other_user'], PDO::PARAM_INT);
+    $block_ins_stmt->execute();
+
+    // フォロー解除
+    // 
+    foreach ($following_user_list as $following_user) {
+        if ($following_user['is_followed'] === $_SESSION['other_user']) {
+            delete_follow($_SESSION['other_user']);
+            break;
+        }    
+    }
+    // 
+    foreach ($other_user_follows as $other_user_follow) {
+        if ($other_user_follow['is_followed'] === $_SESSION['login']['member_id']) {
+            $sql = 'DELETE FROM follows WHERE follow = :follow AND is_followed = :is_followed'; // followかつis_followedであるものを削除する
+            $follow_del_stmt = $dbh->prepare($sql);
+            $follow_del_stmt->bindValue(':follow', $_SESSION['other_user'], PDO::PARAM_INT );
+            $follow_del_stmt->bindValue(':is_followed', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+            $follow_del_stmt->execute();
+            break;
+        }   
+    }
+    header('Location: block.php');
+    exit;   
 }
 ?>    
 
@@ -163,7 +220,8 @@ while ($block_row = $block_stmt->fetch()) {
             <div class="navbar-list">
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
-                    <li><a href="user.php">プロフィール</a></li>
+                    <li><a href="bookmark.php">ブックマーク</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -178,9 +236,43 @@ while ($block_row = $block_stmt->fetch()) {
                         <?php else : ?>        
                             <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
                         <?php endif; ?>                        
-                        <h3><?= h($_SESSION['login']['name']) ?></h3>
+                        <h3><?= h(get_user_name($user_id)) ?></h3>
+
                         <p><?= h($profile_row['profile_content']) ?></p>
-                        <button><a href="profile_edit.php">プロフィールを編集</a></button>
+
+                        <?php if ($user_id === $_SESSION['login']['member_id']) : ?>
+                            <button><a href="profile_edit.php">プロフィールを編集</a></button>
+                        <?php else : ?>
+                            <div class="follow-block">
+                                <!-- フォロー、アンフォロー -->
+                                <form action="" method="post">
+                                    <?php
+                                    $is_following = false;
+                                    // $following_user_list：ログインユーザーにフォローされているユーザー全件の配列
+                                    // ログインユーザーにフォローされていれば、trueとする
+                                    foreach ($following_user_list as $following_user) {
+                                        if($following_user['is_followed'] === $user_id) { 
+                                            $is_following = true;
+                                            break;
+                                        }
+                                    }
+                                    ?> 
+                                    <?php 
+                                    if ($is_following) : ?>
+                                        <input type="hidden" name="delete_follow" value=<?= h($user_id) ?>>
+                                        <button type="submit">フォロー解除</button>
+                                    <?php else : ?>
+                                        <input type="hidden" name="insert_follow" value=<?= h($user_id) ?>>
+                                        <button type="submit">フォローする</button>
+                                    <?php endif; ?>
+                                </form>
+                                <!-- ブロック -->
+                                <form action="" method="post">
+                                    <input type="hidden" name="block_user" value=<?= h($user_id) ?>>  
+                                    <button type="submit">ブロックする</button>
+                                </form>
+                            </div>   
+                        <?php endif ?>    
                     </div>
 
                     <!-- 投稿一覧 -->
@@ -220,6 +312,9 @@ while ($block_row = $block_stmt->fetch()) {
                                         <input type="hidden" name="reply_btn" value=<?= h($post_row['post_id']) ?>>  
                                         <li><input type="submit" value="返信" class="user-button"></li>
                                     </form>
+
+                                    <!-- アカウントボタン -->
+                                    <li><button type="submit"><a href="user.php?id=<?= h($post_row['user_id']) ?>">アカウント</a></button></li>
                 
                                     <!-- いいねボタン -->
                                     <!-- ログインユーザーのいいねをひとつずつを、投稿と照合する。合致したら「いいね解除」とする-->
@@ -251,7 +346,6 @@ while ($block_row = $block_stmt->fetch()) {
                                     <!-- 削除ボタン -->
                                     <form action="" method="post">
                                         <input type="hidden" name="delete_post" value=<?= h($post_row['post_id']) ?>> 
-                                        <!--hiddenで$_POST['delete_post']=>$post_row['post_id']として値を渡すことができる-->
                                         <li><input type="submit" value="削除" class="user-button"></li>
                                     </form>
                                 </ul>
@@ -297,6 +391,9 @@ while ($block_row = $block_stmt->fetch()) {
                                         <li><input type="submit" value="返信" class="user-button"></li>
                                     </form>
 
+                                    <!-- アカウントボタン -->
+                                    <li><button type="submit"><a href="user.php?id=<?= h($reply_row['user_id']) ?>">アカウント</a></button></li>
+
                                     <!-- いいねボタン -->
                                     <?php $post_is_liked_id = get_rep_likes($reply_row['reply_id']) ?>
                                     <form action="" method="post">
@@ -333,7 +430,6 @@ while ($block_row = $block_stmt->fetch()) {
                     <div class="user-goods">
                         <h3>いいね一覧</h3>
                         <?php
-                        $post_likes_reps = get_likes_reps();
                         foreach ($post_likes_reps as $post_like_rep) : 
                             // ブロックしている、されているか確認
                             $block_like = true;
@@ -388,13 +484,8 @@ while ($block_row = $block_stmt->fetch()) {
                                         </form>
 
                                         <!-- アカウントボタン -->
-                                        <?php if ($post_like_rep['user_id'] != $_SESSION['login']['member_id']) : ?>
-                                        <form action="" method="post">
-                                            <input type="hidden" name="user_page" value=<?= h($post_like_rep['user_id']) ?>>
-                                            <li><input type="submit" value="アカウント" class="user-button"></li>
-                                        </form>
-                                        <?php endif ?>
-
+                                        <li><button type="submit"><a href="user.php?id=<?= h($post_like_rep['user_id']) ?>">アカウント</a></button></li>
+       
                                         <!-- いいねボタン -->
                                         <?php if (isset($post_like_rep['reply_id'])) : ?>
                                             <form action="" method="post">
@@ -438,7 +529,7 @@ while ($block_row = $block_stmt->fetch()) {
 
                                         <!-- 削除ボタン -->
                                         <!-- ログインユーザーの投稿or返信いいねのみ表示する -->
-                                        <?php if ($post_like_rep['user_id'] === $_SESSION['login']['member_id']) : ?>
+                                        <?php if ($post_like_rep['user_id'] === $user_id) : ?>
                                             <!-- 返信に対する削除ボタン-->
                                             <?php if (isset($post_like_rep['reply_id'])) : ?>
                                                 <form action="" method="post">
@@ -461,14 +552,11 @@ while ($block_row = $block_stmt->fetch()) {
                     <!-- フォロー一覧 -->
                     <div class="user-follows">
                         <h3>フォロー一覧</h3>
-                        <?php $follows = get_follow($_SESSION['login']['member_id']) ?>
+                        <?php $follows = get_follow($user_id) ?>
                         <?php foreach ($follows as $follow) : ?>
                             <div class="user-follow">
                                 <!-- アイコン -->
-                                <?php
-                                $icon_stmt = get_icon($follow['is_followed']);
-                                $icon_row = $icon_stmt->fetch();
-                                ?>
+                                <?php $icon_row = get_icon($follow['is_followed'])?>
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>        
@@ -502,10 +590,7 @@ while ($block_row = $block_stmt->fetch()) {
                         <?php while ($is_followed_row = $is_followed_stmt->fetch()) : ?>
                             <div class="user-follower">
                                 <!-- アイコン -->
-                                <?php 
-                                $icon_stmt = get_icon($is_followed_row['follow']);
-                                $icon_row = $icon_stmt->fetch();
-                                ?>
+                                <?php $icon_row = get_icon($is_followed_row['follow']) ?>
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>        
