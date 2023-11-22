@@ -1,5 +1,5 @@
 <?php
-// ini_set("display_errors", "OFF");
+//ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 
@@ -62,8 +62,6 @@ if (isset($_FILES['image'])) {
         }
     }
 }
-
-$icon_row = get_icon($_SESSION['login']['member_id']);
 
 // アイコンを削除
 if (isset($_POST['delete_icon'])) {
@@ -159,7 +157,6 @@ if (isset($_POST['delete_profile'])) {
                         <?php endif; ?>
                     
                     <!-- アイコンを削除 -->
-                    
                         <form action="" method="post">
                             <input type="hidden" name="delete_icon">
                             <button type="submit" class="delete_icon">アイコンを削除する</button>
@@ -187,8 +184,9 @@ if (isset($_POST['delete_profile'])) {
                     </div>
 
                     <!-- ブロック中のアカウントを表示するボタン -->
-                    <button><a href="block_account.php">ブロック中のアカウントを見る</a></button>
-
+                    <div class="show-block-account">
+                     <button><a href="block_account.php">ブロック中のアカウントを見る</a></button>
+                    </div>
 
                     <!-- アカウント削除 -->
                     <div class="delete_account">

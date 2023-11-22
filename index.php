@@ -314,9 +314,9 @@ if (isset($_FILES['image'])) {
 
                             <!-- いいねの数 -->
                             <?php if (isset($post['reply_id'])) : ?>
-                                <p class="timeline-likes"><img src="images/heart.png"><?= h(get_rep_likes_number($post['reply_id'])) ?></p>
+                                <p class="timeline-likes"><img src="images/heart.png"> <?= h(get_rep_likes_number($post['reply_id'])) ?></p>
                             <?php else : ?>
-                                <p class="timeline-likes"><img src="images/heart.png"><?= h(get_likes_number($post['post_id'])) ?></p>
+                                <p class="timeline-likes"><img src="images/heart.png"> <?= h(get_likes_number($post['post_id'])) ?></p>
                             <?php endif; ?>
 
                             <!-- ボタン -->
@@ -339,7 +339,7 @@ if (isset($_FILES['image'])) {
                                     <?php endif; ?>
 
                                     <!-- アカウントボタン -->
-                                        <li><button type="submit"><a href="user.php?id=<?= h($post['user_id']) ?>">アカウント</a></button></li>
+                                    <li><button><a href="user.php?id=<?= h($post['user_id']) ?>">アカウント</a></button></li>
     
                                     <!-- いいねボタン -->
                                     <!-- 返信に対するいいねボタン -->

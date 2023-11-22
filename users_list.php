@@ -37,13 +37,6 @@ if (isset($_POST['delete_follow'])) {
     header('Location: users_list.php'); 
 }
 
-// アカウントボタンが押された場合
-if (isset($_POST['user_page'])) {
-    $_SESSION['other_user'] = (int)$_POST['user_page'];
-    header('Location: other_user.php');
-    exit;
-}
-
 // -------ブロック---------
 
 // ログインユーザーがブロックしている、ログインユーザーをブロックしているユーザーを取得
@@ -114,11 +107,9 @@ while ($block_row = $block_stmt->fetch()) {
                                     }
                                     // ブロックしている、されている場合
                                     if ($block_like === false) { ?>
-                                        <form action="" method="post">
-                                            <input type="hidden" name="user_page" value=<?= h($member_row['member_id']) ?>>
-                                            <li><button type="submit">ブロック中</button></li>
-                                        </form>    
+                                        <li><button type="submit"><a href="user.php?id=<?= h($member_row['member_id']) ?>">ブロック中</a></button></li> 
                                     <?php }
+                                    
                                     // ブロックしていない、されていない場合
                                     if ($block_like) :
                                         $is_following = false;

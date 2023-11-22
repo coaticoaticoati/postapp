@@ -14,6 +14,7 @@
 }
 a {
     text-decoration:none;
+    color: black;
 }
 
 textarea {
@@ -23,6 +24,7 @@ textarea {
 main {
     margin-top: 60px;
 }
+
 button {
     border: none; /* 枠線消す */
     background-color: #ebe6e6fb;
@@ -93,7 +95,6 @@ header a {
     display: inline-block;
     padding-left: 30px;
     padding-right: 10px;
-
 }
 
 .btn-post-form {
@@ -101,7 +102,6 @@ header a {
     margin-right: 25px;
     color: rgb(0, 0, 0);
     display: inline-block;
-    
     border-radius: 100vh;
     font-size: 15px;
   }
@@ -118,8 +118,7 @@ header a {
   }  
 
 .timeline {
-    margin-top: 10px;
-    padding-top: 20px;
+    padding-top: 28px;
     margin-bottom: 100px;
     text-align: center;
     border-bottom: 1px solid #dbd9d9;
@@ -132,7 +131,7 @@ header a {
 
 .timeline-buttons {
     border-bottom: 1px solid #dbd9d9;
-    
+    padding-bottom: 16px;
 }
 
 .timeline-buttons:last-child {
@@ -222,31 +221,39 @@ header a {
 .user {
     text-align: center;
     border-bottom:1px solid #dbd9d9;
+    padding-bottom: 18px;
 }
 
 .user-profile a {
     color: black;
 }
 
-/* other_user.php */
-
-.other-user {
-    text-align: center;
-    border-bottom: 1px solid #dbd9d9;
+.follow-block-list {
+        display: flex;
+        justify-content: center;
+        padding-left: 0;
+        gap: 6px 4px;
 }
 
-.follow-block {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px 20px;
+.follow-block-list li {
+    list-style: none;
+    margin-left: 4px;
 }
-
-/* user.php、other_user.php */
 
 .user-profile {
     padding-top: 10px;
     padding-bottom: 20px;
+}
+
+.user-title {
+    margin-bottom: 0px;
+}
+
+.user-post {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px 20px;
 }
 
 .user-username {
@@ -261,22 +268,21 @@ header a {
     border: 3px solid #999;
 }
 
-/* 投稿一覧 */
-
-.user-posts {
-    border-top: 1px solid #dbd9d9;
-    border-bottom: 1px solid #dbd9d9;
+.user-likes {
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
 
-.user-post {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px 20px;
+.user-date {
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
-
 .user-post-image {
     margin: 0;
+}
+
+.user-post-buttons {
+    padding-bottom: 16px;
 }
 
 .user-post-btn-list {
@@ -284,58 +290,30 @@ header a {
     justify-content: center;
     padding-left: 0;
     gap: 6px 4px;
+    margin-bottom: 0px;
+    margin-top: 0px;
 }
 
 .user-post-btn-list li {
     list-style: none;
 }
 
-/* 返信一覧 */
+.user-post-stmt {
+    margin-top: 0;
 
-.user-reply {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px 20px;
 }
 
-.user-reply-btn-list {
-    display: flex;
-    justify-content: center;
-    padding-left: 0;
-    gap: 6px 4px;
-}
+/* 投稿一覧 */
 
-.user-reply-btn-list li {
-    list-style: none;
+.user-posts {
+    border-top: 1px solid #dbd9d9;
+    border-bottom: 1px solid #dbd9d9;
 }
 
 /* いいね一覧 */
 
 .user-goods {
     border-top:1px solid #dbd9d9;
-}
-
-.user-good {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px 20px;
-}
-
-.user-post-stmt {
-    margin-top: 0;
-
-}
-.user-good-btn-list {
-    display: flex;
-    justify-content: center;
-    padding-left: 0;
-    gap: 6px 4px;
-}
-
-.user-good-btn-list li {
-    list-style: none;
 }
 
 /* フォロー一覧 */
@@ -345,17 +323,23 @@ header a {
     border-bottom:1px solid #dbd9d9;
 }
 
+.user-follows h3 {
+    margin-bottom: 0px;
+}
+
 .user-follow {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 6px 20px;
 }
+
 .user-follow-btn-list {
     display: flex;
     justify-content: center;
     padding-left: 0;
     gap: 6px 4px;
+    margin-top: 0px;
 }
 
 .user-follow-btn-list li {
@@ -371,11 +355,16 @@ header a {
     gap: 6px 20px;
 }
 
+.user-follower h3 {
+    margin-bottom: 0px;
+}
+
 .user-follower-btn-list {
     display: flex;
     justify-content: center;
     padding-left: 0;
     gap: 6px 4px;
+    margin-top: 0px;
 }
 
 .user-follower-btn-list li {
@@ -464,18 +453,16 @@ padding-bottom: 20px;
 .users-list {
     text-align: center;
     border-bottom:1px solid #dbd9d9;
-}
-
-.users-list-icon {
-    margin-top: 35px;
+    padding-top: 14px;
 }
 
 .users-list-username {
     font-weight: bold;
+    margin-top: 12px;
 }
 
 .users-list-buttons {
-    border-bottom:1px solid #dbd9d9;
+    border-bottom: 1px solid #dbd9d9;
 }
 
 .users-list-buttons:last-child {
@@ -491,13 +478,15 @@ padding-bottom: 20px;
 
 .users-list-btn-list li {
     list-style: none;
+    margin-left: 4px;
 }
 
 /* profile_edit.php */
 
 .edit {
     text-align: center;
-    margin: 65px 0;
+    margin: 56px 0;
+    border-bottom:1px solid #dbd9d9;
 }
 
 .edit-user {
@@ -518,7 +507,6 @@ padding-bottom: 20px;
 
 .edit-profile-stmt {
     border-bottom:1px solid #dbd9d9;
-    margin-bottom: 40px;
     padding-bottom: 30px;
 }
 
@@ -528,12 +516,16 @@ padding-bottom: 20px;
 }
 
 .profile-form button{
-    margin: 10px 0;
+    margin: 12px 0 18px 0;
     padding: 8px 12px;
 }
 
-.delete-profile {
-    margin-top: 18px;
+.show-block-account {
+    margin: 30px 0 22px 0;
+}
+
+.delete_account {
+    margin-bottom: 30px;
 }
 
 /* bookmark.php */
@@ -544,10 +536,38 @@ padding-bottom: 20px;
 .block {
     text-align: center;
     padding-top: 40px;
-
 }
-.block button{
+
+.block button {
     margin-top: 20px;
+}
+
+/* block_account.php */
+
+.block-account {
+    text-align: center;
+    border-bottom: 1px solid #dbd9d9;
+    padding-top: 12px;
+    margin-bottom: 100px;
+}
+
+.block-account h3 {
+    padding-top: 38px;
+    margin-bottom: 50px;
+}
+
+.block-account-btn {
+    border-bottom: 1px solid #dbd9d9;
+    padding-top: 4px; 
+    padding-bottom: 18px;   
+}
+
+.block-account-btn:last-child {
+    border: none;
+  }
+
+.no-block-account-btn {
+    padding-bottom: 70px;
 }
 
 /* account_entry.php */
@@ -581,7 +601,7 @@ padding-bottom: 20px;
     margin-top: 40px;
 
 }
-.confirm h3 {
+.confirm h2 {
     padding: 20px 0;
 }
 
@@ -590,8 +610,6 @@ padding-bottom: 20px;
 }
 
 .btn-confirm button {
-    padding: 8px 12px;
-    border-radius: 100vh;
     margin: 0 15px
 }
 
@@ -622,14 +640,17 @@ padding-bottom: 20px;
 /* account_delete.php */
 
 .delete-account {
-    padding-top: 40px;
+    padding-top: 50px;
     text-align: center;
 }
 
+.delete-account h3{
+    margin-bottom: 50px;
+}
+
+
 .delete-account button {
-    margin-top: 20px;
-    padding: 8px 12px;
-    border-radius: 100vh;
+    margin: 0 15px;
 }
 
 .delete_account a {

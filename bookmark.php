@@ -12,7 +12,6 @@ if (empty($_SESSION)) {
 // データベース接続
 $dbh = db_open();
 
-
 // 新規のカテゴリー名を登録
 if (isset($_POST['insert_category'])) {
     insert_category_name($_POST['insert_category']);
@@ -20,14 +19,12 @@ if (isset($_POST['insert_category'])) {
     exit;
 }
 
-// カテゴリー名を取得
-$category_names = get_category_names();
-
 // ブックマークに登録済みの投稿と返信を取得
 $sql ='SELECT bookmarks.id, posts.post_id, bookmarks.post_id, pressed_at, created_at, content, bookmarks.user_id, posts.file_path
 FROM bookmarks 
 INNER JOIN posts ON bookmarks.post_id = posts.post_id
-WHERE bookmarks.user_id = :user_id';
+WHERE bookmarks.user_id = :user_id
+GROUP BY bookmarks.post_id';
 $bm_post_stmt = $dbh->prepare($sql);
 $bm_post_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
 $bm_post_stmt->execute();
@@ -37,7 +34,8 @@ while ($bm_post_row = $bm_post_stmt->fetch()) {
 $sql ='SELECT bookmarks.id, replies.reply_id, bookmarks.reply_id, bookmarks.pressed_at, created_at, content, bookmarks.user_id
 FROM bookmarks 
 INNER JOIN replies ON bookmarks.reply_id = replies.reply_id
-WHERE bookmarks.user_id = :user_id';
+WHERE bookmarks.user_id = :user_id
+GROUP BY bookmarks.reply_id';
 $bm_rep_stmt = $dbh->prepare($sql);
 $bm_rep_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
 $bm_rep_stmt->execute();
@@ -48,7 +46,7 @@ var_dump($bookmarks);
 
 // 投稿または返信をカテゴリーに追加
 if (isset($_POST['ins_posts_to_categ'])) {
-    $sql = 'INSERT INTO bookmarks (post_id, reply_id, user_id, category_id) 
+    $sql = 'INSERT IGNORE INTO bookmarks (post_id, reply_id, user_id, category_id) 
     VALUES (:post_id, :reply_id, :user_id, :category_id)';
     $bm_ins_stmt = $dbh->prepare($sql);
     $bm_ins_stmt->bindValue(':category_id', $_POST['ins_posts_to_categ'], PDO::PARAM_INT);
@@ -57,10 +55,6 @@ if (isset($_POST['ins_posts_to_categ'])) {
     $bm_ins_stmt->bindValue(':reply_id', $_POST['insert_rep_bm'], PDO::PARAM_INT);
     $bm_ins_stmt->execute();
 }
-
-var_dump($_POST['insert_bm']);
-
-
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -87,12 +81,17 @@ var_dump($_POST['insert_bm']);
 
 
         <!-- カテゴリー一覧 -->
+        <?php
+        // カテゴリー名を取得
+        $category_names = get_category_names();
+        ?>
         <ul>
             <?php foreach ($category_names as $category_name) : ?>
                 <li><a href="category.php?id=<?= h($category_name['id']) ?>"><?= h($category_name['name']) ?></a></li>
             <?php endforeach ?>  
         </ul>
 
+        <!-- カテゴリー追加を追加 -->
         <form action="" method="post">
             <p>新規追加</p>
             <input type="text" name="insert_category">
@@ -101,7 +100,7 @@ var_dump($_POST['insert_bm']);
       </div>
 
       <!-- 投稿または返信をカテゴリーに追加 -->
-    <form action="" method="post" id="chk">
+    <form action="" method="post" id="category">
         <select name="ins_posts_to_categ">
             <option value=""></option>
             <?php foreach ($category_names as $category_name) : ?>
@@ -118,11 +117,11 @@ var_dump($_POST['insert_bm']);
         <div class="container">
             <div class="timeline-contents">
                 <?php foreach ($bookmarks as $bookmark) : ?>
-                    <fieldset form="chk">
-                        <input type="hidden" name="insert_bm" value=<?= h($bookmark['post_id']) ?>>
-                        <input type="hidden" name="insert_rep_bm" value=<?= h($bookmark['reply_id']) ?>>
-                        <input type="checkbox" name="id" value="<?= h($bookmark['id']) ?>">
-                    </fieldset>
+                  
+                    <!-- チェックボックス -->
+                    <input type="hidden" form="category" name="insert_bm" value="<?= h($bookmark['post_id']) ?>">
+                    <input type="hidden" form="category" name="insert_rep_bm" value="<?= h($bookmark['reply_id']) ?>">
+                    <input type="checkbox" form="category" name="id" value="<?= h($bookmark['id']) ?>">
                     
                     <!-- アイコン -->
                     <div class="timeline-icon">
@@ -189,10 +188,7 @@ var_dump($_POST['insert_bm']);
                             <?php endif; ?>
 
                             <!-- アカウントボタン -->
-                            <form action="" method="post">
-                                <input type="hidden" name="user_page" value=<?= h($bookmark['user_id']) ?>>
-                                <li><button type="submit">アカウント</button></li>
-                            </form>
+                            <li><button type="submit"><a href="user.php?id=<?= h($bookmark['user_id']) ?>">アカウント</a></button></li>
 
                             <!-- いいねボタン -->
                             <!-- 返信に対するいいねボタン -->

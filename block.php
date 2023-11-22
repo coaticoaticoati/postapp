@@ -6,8 +6,7 @@ session_start();
 // データベース接続
 $dbh = db_open(); 
 
-
-//
+// 
 $user_id = (int)$_GET['id'];
 
 // ブロック解除が押された場合
@@ -19,10 +18,9 @@ if (isset($_POST['unblock_user'])) {
     $block_del_stmt->bindValue(':block', $_SESSION['login']['member_id'], PDO::PARAM_INT);
     $block_del_stmt->bindValue(':is_blocked', $user_id, PDO::PARAM_INT);
     $block_del_stmt->execute();
-    header('Location: user.php?id='.$user_id);
+    header('Location: block_account.php');
     exit;
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -48,8 +46,9 @@ if (isset($_POST['unblock_user'])) {
             <div class="block">
                 <div class="container">
                     <?php
-                    // ログインユーザーが参照中ユーザーをブロックしている、ログインユーザーが参照中ユーザーにブロックされてるか確認
+                    // ログインユーザーが参照中ユーザーをブロックしているか確認
                     $block_user = get_block_user($user_id);
+                    // ログインユーザーが参照中ユーザーにブロックされてるか確認
                     $blocked_user = get_blocked_user($user_id);
 
                     // ブロックしているか、されているかで表示を変える
