@@ -37,6 +37,7 @@ if(isset($_POST['user_delete'])) {
                     <form action="" method="post">
                         <input type="hidden" name="user_delete" value=<?= h($_SESSION['login']['member_id']) ?>> 
                         <button type="submit">削除する</button>
+                        <button><a href="profile_edit.php">戻る</a></button>
                     </form>
                 </div>    
             </div>

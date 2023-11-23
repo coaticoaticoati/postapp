@@ -506,7 +506,7 @@ function get_blocked_user($get_blocked_user) {
 // ------アイコン、プロフィール------
 
 // アイコンをデータベースに追加、あれば更新
-function insert_icons($file_name, $save_path) {
+function insert_icon($file_name, $save_path) {
     $dbh = db_open();
     $sql = 'INSERT INTO icons (file_name, file_path, user_id)
     VALUES (:file_name, :file_path, :user_id) ON DUPLICATE KEY UPDATE 

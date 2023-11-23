@@ -41,25 +41,36 @@ while ($blocked_user = $block_stmt->fetch()) {
             </div>
         </header>    
         <main>
-            <?php foreach ($blocked_users as $blocked_user) : ?>
+            <div class="block-account">
+                <div class="container">
+                    <?php if (empty($blocked_users)) : ?>
+                        <h3>ブロック中のユーザーはいません</h3>
+                        <div class="no-block-account-btn">
+                            <button><a href="profile_edit.php">戻る</a></button>
+                        </div>
+                    <?php else : ?>
+                        <?php foreach ($blocked_users as $blocked_user) : ?>
+                            <!-- アイコン -->
+                            <div class="timeline-icon">
+                                <?php
+                                    $icon_row = get_icon($blocked_user['is_blocked']);
+                                    if (empty($icon_row)) : ?>
+                                        <p><img src="images/animalface_tanuki.png" class="icon"><p>
+                                    <?php else : ?>        
+                                        <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                                    <?php endif; ?>
+                            </div>
 
-                <!-- アイコン -->
-                <div class="timeline-icon">
-                    <?php
-                        $icon_row = get_icon($blocked_user['is_blocked']);
-                        if (empty($icon_row)) : ?>
-                            <p><img src="images/animalface_tanuki.png" class="icon"><p>
-                        <?php else : ?>        
-                            <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
-                        <?php endif; ?>
+                            <!-- ユーザー名 -->
+                            <p><?= h($blocked_user['name']) ?></p>
+
+                            <!-- ボタン -->
+                            <div class="block-account-btn">
+                                <button><a href="user.php?id=<?= h($blocked_user['is_blocked']) ?>">ブロック解除</a></button>
+                            </div>
+                        <?php endforeach ?>
+                    <?php endif ?>    
                 </div>
-                
-                <p><?= h($blocked_user['name']) ?></p>
-
-                <button><a href="user.php?id=<?= h($blocked_user['is_blocked']) ?>">ブロック解除</a></button>
-
-            <?php endforeach ?>
-        </div>
             </div>
         </main>
     </body>
