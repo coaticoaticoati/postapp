@@ -83,7 +83,7 @@ while ($block_row = $block_stmt->fetch()) {
                         <?php if (empty($icon_row)) : ?>
                             <p class="users-list-icon"><img src="images/animalface_tanuki.png" class="icon"><p>
                         <?php else : ?>        
-                            <p class="users-list-icon"><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                            <p class="users-list-icon"><img src="<?= h($icon_row) ?>" class="icon" ></p>
                         <?php endif; ?>
 
                         <!-- ユーザー名 -->
@@ -91,7 +91,7 @@ while ($block_row = $block_stmt->fetch()) {
 
                         <!-- プロフィール -->
                         <?php $profile_row = get_profile($member_row['member_id']) ?>
-                        <p><?= h($profile_row['profile_content']) ?></p>
+                        <p><?= h($profile_row) ?></p>
 
                         <div class="users-list-buttons">
                             <ul class="users-list-btn-list">

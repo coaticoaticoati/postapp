@@ -12,20 +12,7 @@ if (empty($_SESSION)) {
 // データベース接続
 $dbh = db_open();
 
-// 投稿文の返信ボタンが押された場合
-if (isset($_POST['reply_btn_post'])) {
-    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_post'];
-    header('Location: reply.php');
-    exit;
-}
-
-// 返信文の返信ボタンが押された場合
-if (isset($_POST['reply_btn_reply'])) {
-    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_reply'];
-    $_SESSION['reply_btn_reply_id'] = (int)$_POST['reply_btn_reply_id'];
-    header('Location: reply.php#reply');
-    exit;
-}
+$redirect_back = 'Location: index.php';
 
 // -------投稿-------
 
@@ -65,75 +52,90 @@ if (isset($posts)) {
     array_multisort($created_at_array, SORT_DESC, $user_id_array, SORT_ASC, $posts);
 }
 
+// 投稿文の返信ボタンが押された場合
+if (isset($_POST['reply_btn_post'])) {
+    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_post'];
+    header('Location: reply.php');
+    exit;
+}
+
 // 削除ボタンが押された場合
 if (isset($_POST['delete_post'])) {
     delete_post((int)$_POST['delete_post']);
-    header('Location: index.php');
+    header($redirect_back);
     exit;  
 }
 
 // いいねボタンが押された場合
 if (isset($_POST['insert_like'])) {
     insert_like((int)$_POST['insert_like']);
-    header('Location: index.php');
+    header($redirect_back);
     exit;
 }
 
 // いいね解除ボタンが押された場合
 if (isset($_POST['delete_like'])) {
     delete_like((int)$_POST['delete_like']);
-    header('Location: index.php');
+    header($redirect_back);
     exit;
 }
 
 // ブックマークボタンが押された場合
 if (isset($_POST['insert_bm'])) {
     insert_bookmark((int)$_POST['insert_bm']);
-    header('Location: index.php');
+    header($redirect_back);
     exit;
 }
 
 // ブックマーク解除ボタンが押された場合
 if (isset($_POST['delete_bm'])) {
     delete_bookmark((int)$_POST['delete_bm']);
-    header('Location: index.php');
+    header($redirect_back);
     exit;
 }
 
 // -------返信-------
 
+// 返信文の返信ボタンが押された場合
+if (isset($_POST['reply_btn_reply'])) {
+    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_reply'];
+    $_SESSION['reply_btn_reply_id'] = (int)$_POST['reply_btn_reply_id'];
+    header('Location: reply.php#reply');
+    exit;
+}
+
 // いいねが押された場合
 if (isset($_POST['insert_reply_like'])) {
     insert_reply_like((int)$_POST['insert_reply_like']);
-    header('Location: index.php');
+    header($redirect_back);
     exit;
 }
 
 // いいね解除ボタンが押された場合
 if (isset($_POST['delete_reply_like'])) {
     delete_reply_like((int)$_POST['delete_reply_like']);
-    header('Location: index.php');
+    header($redirect_back);
     exit;
 }
 
 // 削除ボタンが押された場合
 if (isset($_POST['delete_reply'])) {
     delete_reply($_POST['delete_reply']);
-    header('Location: index.php');
+    header($redirect_back);
     exit;
 }
 
 // ブックマークボタンが押された場合
 if (isset($_POST['insert_reply_bm'])) {
     insert_rep_bookmark((int)$_POST['insert_reply_bm']);
-    header('Location: index.php');
+    header($redirect_back);
     exit;
 }
 
 // ブックマーク解除ボタンが押された場合
 if (isset($_POST['delete_reply_bm'])) {
     delete_rep_bookmark((int)$_POST['delete_reply_bm']);
-    header('Location: index.php');
+    header($redirect_back);
     exit;
 }
 
@@ -144,7 +146,7 @@ if($_POST['content'] === '') {
     $error['content'] = 'blank';
 }
 // 投稿文が200字以内か
-if(strlen($_POST['content']) > 200) {
+if(strlen($_POST['content']) > 600) {
     $error['content'] = 'over';
 }
 
@@ -281,7 +283,7 @@ if (isset($_FILES['image'])) {
                                     if (empty($icon_row)) : ?>
                                         <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                     <?php else : ?>        
-                                        <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                                        <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
                                     <?php endif; ?>
                             </div>
 

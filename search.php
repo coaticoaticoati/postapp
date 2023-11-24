@@ -153,7 +153,7 @@ while ($block_row = $block_stmt->fetch()) {
                                         <?php if (empty($icon_row)) : ?>
                                             <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                         <?php else : ?>        
-                                            <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                                            <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
                                         <?php endif; ?>
                                     </div>
 
@@ -251,7 +251,7 @@ while ($block_row = $block_stmt->fetch()) {
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>        
-                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                                    <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
                                 <?php endif; ?>
                             </div>
 

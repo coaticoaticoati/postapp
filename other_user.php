@@ -232,12 +232,12 @@ if (isset($_POST['block_user'])) {
                         <?php if (empty($icon_row)) : ?>
                             <p><img src="images/animalface_tanuki.png" class="icon"><p>
                         <?php else : ?>    
-                            <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
+                            <p><img src="<?= h($icon_row) ?>" class="icon"></p>
                         <?php endif; ?>
                         <!-- ユーザー名 -->
                         <h3><?= h(get_user_name($_SESSION['other_user'])) ?></h3>
                         <!-- プロフィール文 -->
-                        <p><?= h($profile_row['profile_content']) ?></p>
+                        <p><?= h($profile_row) ?></p>
                         <div class="follow-block">
                             <!-- フォロー、アンフォロー -->
                             <form action="" method="post">
@@ -278,7 +278,7 @@ if (isset($_POST['block_user'])) {
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>    
-                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
+                                    <p><img src="<?= h($icon_row) ?>" class="icon"></p>
                                 <?php endif; ?>                                
                                 <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($post_row['user_id'])) ?></p>
@@ -348,7 +348,7 @@ if (isset($_POST['block_user'])) {
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>    
-                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
+                                    <p><img src="<?= h($icon_row) ?>" class="icon"></p>
                                 <?php endif; ?>
                                 <!-----ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($reply_row['user_id'])) ?></p>
@@ -418,7 +418,7 @@ if (isset($_POST['block_user'])) {
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>    
-                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
+                                    <p><img src="<?= h($icon_row) ?>" class="icon"></p>
                                 <?php endif; ?>  
 
                                 <!-- ユーザー名 -->
@@ -570,7 +570,7 @@ if (isset($_POST['block_user'])) {
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>    
-                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
+                                    <p><img src="<?= h($icon_row) ?>" class="icon"></p>
                                 <?php endif; ?>
                                 <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($other_user_follow['is_followed'])) ?></p>
@@ -628,7 +628,7 @@ if (isset($_POST['block_user'])) {
                             <?php if (empty($icon_row)) : ?>
                                 <p><img src="images/animalface_tanuki.png" class="icon"><p>
                             <?php else : ?>    
-                                <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
+                                <p><img src="<?= h($icon_row) ?>" class="icon"></p>
                             <?php endif; ?>
                             <!-- ユーザー名 -->
                             <p class="user-username"><?= h(get_user_name($is_followed_row['follow'])) ?></p>

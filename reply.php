@@ -12,47 +12,42 @@ if (empty($_SESSION)) {
 // データベース接続
 $dbh = db_open();
 
-// アカウントボタンが押された場合
-if (isset($_POST['user_page'])) {
-    $_SESSION['other_user'] = (int)$_POST['user_page'];
-    header('Location: other_user.php');
-    exit;
-}
+$redirect_back = 'Location: reply.php';
 
 // -------投稿-------
 
 // いいねが押された場合
 if (isset($_POST['insert_like'])) {
     insert_like((int)$_POST['insert_like']);
-    header('Location: reply.php');
+    header($redirect_back);
     exit;
 }
 
 // いいね解除ボタンが押された場合
 if (isset($_POST['delete_like'])) {
     delete_like((int)$_POST['delete_like']);
-    header('Location: reply.php');
+    header($redirect_back);
     exit;
 }
 
 // 削除ボタンが押された場合
 if (isset($_POST['delete_post'])) {
     delete_post($_POST['delete_post']); 
-    header('Location: reply.php');
+    header($redirect_back);
     exit;
 }
 
 // ブックマークボタンが押された場合
 if (isset($_POST['insert_bm'])) {
     insert_bookmark((int)$_POST['insert_bm']);
-    header('Location: reply.php');
+    header($redirect_back);
     exit;
 }
 
 // ブックマーク解除ボタンが押された場合
 if (isset($_POST['delete_bm'])) {
     delete_bookmark((int)$_POST['delete_bm']);
-    header('Location: reply.php');
+    header($redirect_back);
     exit;
 }
 
@@ -61,35 +56,35 @@ if (isset($_POST['delete_bm'])) {
 // いいねが押された場合
 if (isset($_POST['insert_reply_like'])) {
     insert_reply_like((int)$_POST['insert_reply_like']);
-    header('Location: reply.php');
+    header($redirect_back);
     exit;
 }
 
 // いいね解除ボタンが押された場合
 if (isset($_POST['delete_reply_like'])) {
     delete_reply_like((int)$_POST['delete_reply_like']);
-    header('Location: reply.php');
+    header($redirect_back);
     exit;
 }
 
 // 削除ボタンが押された場合
 if (isset($_POST['delete_reply'])) {
     delete_reply($_POST['delete_reply']);
-    header('Location: reply.php');
+    header($redirect_back);
     exit;
 }
 
 // ブックマークボタンが押された場合
 if (isset($_POST['insert_reply_bm'])) {
     insert_rep_bookmark((int)$_POST['insert_reply_bm']);
-    header('Location: reply.php');
+    header($redirect_back);
     exit;
 }
 
 // ブックマーク解除ボタンが押された場合
 if (isset($_POST['delete_reply_bm'])) {
     delete_rep_bookmark((int)$_POST['delete_reply_bm']);
-    header('Location: reply.php');
+    header($redirect_back);
     exit;
 }
 
@@ -125,7 +120,7 @@ if($_POST['reply_form'] === '') {
 }
 
 // 文章が200字以内か
-if(strlen($_POST['reply_form']) > 200) {
+if(strlen($_POST['reply_form']) > 600) {
     $reply_error['reply_form'] = 'over';
 }
 
@@ -239,7 +234,7 @@ while ($block_row = $block_stmt->fetch()) {
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>    
-                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
+                                    <p><img src="<?= h($icon_row) ?>" class="icon"></p>
                                 <?php endif; ?>
 
                                 <!-- ユーザー名 -->
@@ -257,16 +252,13 @@ while ($block_row = $block_stmt->fetch()) {
                                 <p><?= h($post_row['created_at']) ?></p>
 
                                 <!-- いいねの数 -->
-                                    <p class="timeline-likes"><img src="images/heart.png"><?= h(get_likes_number($post_row['post_id'])) ?></p>
+                                <p class="timeline-likes"><img src="images/heart.png"> <?= h(get_likes_number($post_row['post_id'])) ?></p>
                                 
                                 <!-- ボタン -->
                                 <div class="reply-parent-buttons">      
                                     <ul class="reply-parent-btn-list">
                                         <!-- アカウントボタン -->
-                                        <form action="" method="post">
-                                            <input type="hidden" name="user_page" value=<?= h($post_row['user_id']) ?>>
-                                            <li><button type="submit">アカウント</button></li>
-                                        </form>
+                                        <li><button><a href="user.php?id=<?= h($post_row['user_id']) ?>">アカウント</a></button></li>
 
                                         <!-- いいねボタン -->
                                         <form action="" method="post">
@@ -359,13 +351,13 @@ while ($block_row = $block_stmt->fetch()) {
                                                 <?php if (empty($icon_row)) : ?>
                                                     <p id="reply"><img src="images/animalface_tanuki.png" class="icon"><p>
                                                     <?php else : ?>    
-                                                        <p id="reply"><img src="<?= h($icon_row['file_path']) ?>" class="icon"></p>
+                                                        <p id="reply"><img src="<?= h($icon_row) ?>" class="icon"></p>
                                                     <?php endif; ?>
                                             <?php else : ?>
                                                 <?php if (empty($icon_row)) : ?>
                                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                                 <?php else : ?>        
-                                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                                                    <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
                                                 <?php endif; ?>
                                             <?php endif; ?>
 
@@ -380,15 +372,12 @@ while ($block_row = $block_stmt->fetch()) {
                                         <p><?= h($reply['created_at']) ?></p>
 
                                         <!--　いいねの数　-->
-                                        <p class="timeline-likes"><img src="images/heart.png"><?= h(get_rep_likes_number($post['reply_id'])) ?></p>
+                                        <p class="timeline-likes"><img src="images/heart.png"><?= h(get_rep_likes_number($reply['reply_id'])) ?></p>
                             
                                         <div class="reply-child-buttons">
                                             <ul class="reply-child-btn-list">
                                                 <!-- アカウントボタン -->
-                                                <form action="" method="post">
-                                                    <input type="hidden" name="user_page" value=<?= h($reply['user_id']) ?>>
-                                                    <li><button type="submit">アカウント</button></li>
-                                                </form>
+                                                <li><button><a href="user.php?id=<?= h($reply['user_id']) ?>">アカウント</a></button></li>
 
                                                 <!-- いいねボタン -->
                                                 <form action="" method="post">

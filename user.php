@@ -235,11 +235,11 @@ if (isset($_POST['block_user'])) {
                         <?php if (empty($icon_row)) : ?>
                             <p><img src="images/animalface_tanuki.png" class="icon"><p>
                         <?php else : ?>        
-                            <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                            <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
                         <?php endif; ?>                        
                         <h3><?= h(get_user_name($user_id)) ?></h3>
 
-                        <p><?= h($profile_row['profile_content']) ?></p>
+                        <p><?= h($profile_row) ?></p>
 
                         <?php if ($user_id === $_SESSION['login']['member_id']) : ?>
                             <button><a href="profile_edit.php">プロフィールを編集</a></button>
@@ -286,7 +286,7 @@ if (isset($_POST['block_user'])) {
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>        
-                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                                    <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
                                 <?php endif; ?>                                
                                 <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($post_row['user_id'])) ?></p>
@@ -365,7 +365,7 @@ if (isset($_POST['block_user'])) {
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>        
-                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                                    <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
                                 <?php endif; ?>
                                 <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($reply_row['user_id'])) ?></p>
@@ -449,7 +449,7 @@ if (isset($_POST['block_user'])) {
                                     <?php if (empty($icon_row)) : ?>
                                         <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                     <?php else : ?>        
-                                        <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                                        <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
                                     <?php endif; ?>                                    
                                     <!-- ユーザー名 -->
                                     <p class="user-username"><?= h(get_user_name($post_like_rep['user_id'])) ?></p>
@@ -562,7 +562,7 @@ if (isset($_POST['block_user'])) {
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>        
-                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                                    <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
                                 <?php endif; ?>                                
                                 <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($follow['is_followed'])) ?></p>
@@ -597,7 +597,7 @@ if (isset($_POST['block_user'])) {
                                 <?php if (empty($icon_row)) : ?>
                                     <p><img src="images/animalface_tanuki.png" class="icon"><p>
                                 <?php else : ?>        
-                                    <p><img src="<?= h($icon_row['file_path']) ?>" class="icon" ></p>
+                                    <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
                                 <?php endif; ?>                                
                                 <!-- ユーザー名 -->
                                 <p class="user-username"><?= h(get_user_name($is_followed_row['follow'])) ?></p>

@@ -41,6 +41,52 @@ button {
     padding: 6px 10px;
 }
 
+/* index.php, bookmark.php, category.php共通  */
+
+
+.timeline-buttons {
+    border-bottom: 1px solid #dbd9d9;
+    padding-bottom: 16px;
+}
+
+.timeline-buttons:last-child {
+    border: none;
+  }
+
+.timeline-btn-list {
+    display: flex;
+    justify-content: center;
+    padding-left: 0;
+    gap: 6px 4px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+}   
+
+.timeline-btn-list li {
+    list-style: none;
+}
+
+.timeline-username p {
+   font-weight: bold;
+   margin-bottom: 12px;
+   margin-top: 0px;
+}
+
+.timeline-post p {
+    margin-bottom: 12px;
+    margin-top: 0px;
+}
+
+.timeline-likes {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.timeline-date p {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
 /* ヘッダー */
 
 header {
@@ -127,49 +173,6 @@ header a {
 .timeline-contents {
     padding-top: 0;
     border-top : 1px solid #dbd9d9;
-}
-
-.timeline-buttons {
-    border-bottom: 1px solid #dbd9d9;
-    padding-bottom: 16px;
-}
-
-.timeline-buttons:last-child {
-    border: none;
-  }
-
-.timeline-btn-list {
-    display: flex;
-    justify-content: center;
-    padding-left: 0;
-    gap: 6px 4px;
-    margin-bottom: 0px;
-    margin-top: 0px;
-}   
-
-.timeline-btn-list li {
-    list-style: none;
-}
-
-.timeline-username p {
-   font-weight: bold;
-   margin-bottom: 12px;
-   margin-top: 0px;
-}
-
-.timeline-post p {
-    margin-bottom: 12px;
-    margin-top: 0px;
-}
-
-.timeline-likes {
-    margin-bottom: 5px;
-    margin-top: 5px;
-}
-
-.timeline-date p {
-    margin-bottom: 5px;
-    margin-top: 5px;
 }
 
 /* search.php */
@@ -528,9 +531,63 @@ padding-bottom: 20px;
     margin-bottom: 30px;
 }
 
-/* bookmark.php */
+/* bookmark.php, category.php*/
+.bm-main {
+    display: flex;
+    min-height: 100vh;
+}
+.bm-contents {
+    width: 700px;
+    margin: 0 auto;
+    text-align: center;
+    /* flex: 1; */
+}
 
+.check-box {
+    margin-top: 10px;
+    margin-bottom: 0;
 
+}
+
+.bm-icon p {
+margin: 8px 0;
+
+}
+
+.left-side {
+    width: 20%;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #dbd9d9;
+    
+}
+
+.left-side-bar {
+    margin: 20px 0 0 20px;
+    padding: 0;
+}
+
+.category-name-list {
+    list-style: none;
+    padding: 0;
+}
+
+.category-name-list li {
+    margin-top: 10px;
+}
+
+.right-side {
+    width: 20%;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #dbd9d9;
+}
+
+.right-side-bar {
+    margin: 20px 0 0 20px;
+}
 
 /* block.php */
 

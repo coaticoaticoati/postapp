@@ -392,7 +392,7 @@ function insert_category_name($insert_category_name) {
     $category_ins_stmt->execute();
 }
 
-// カテゴリー名を取得
+// ログインユーザーの全てのカテゴリー名を取得
 function get_category_names() {
     $dbh = db_open();
     $sql ='SELECT id, name FROM categories
@@ -526,7 +526,7 @@ function get_icon($get_icon) {
     $icon_stmt->bindValue(':user_id', $get_icon, PDO::PARAM_INT);
     $icon_stmt->execute();
     $icon_row = $icon_stmt->fetch();
-    return $icon_row;
+    return $icon_row['file_path'];
 } 
 
 // アイコンの削除
