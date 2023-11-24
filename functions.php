@@ -541,14 +541,14 @@ function delete_icon($delete_icon) {
 // プロフィール文の取得
 function get_profile($get_profile) {
     $dbh = db_open();
-    $sql ='SELECT profiles.profile_content, members.name 
+    $sql ='SELECT profiles.profile_content
     FROM profiles INNER JOIN members ON profiles.user_id = members.member_id 
     WHERE member_id = :member_id';
     $profile_stmt = $dbh->prepare($sql);
     $profile_stmt->bindValue(':member_id', $get_profile, PDO::PARAM_INT);
     $profile_stmt->execute();
     $profile_row = $profile_stmt->fetch();
-    return $profile_row;
+    return $profile_row['profile_content'];
 } 
 
 // プロフィール文の削除
