@@ -225,6 +225,7 @@ header a {
     text-align: center;
     border-bottom:1px solid #dbd9d9;
     padding-bottom: 18px;
+    margin-bottom: 100px;
 }
 
 .user-profile a {
@@ -379,6 +380,7 @@ header a {
 .reply {
     text-align: center;
     border-bottom: 1px solid #dbd9d9;
+    margin-bottom: 100px;
 }
 
 .reply-username {
@@ -390,7 +392,7 @@ header a {
 
 .reply-parent {
     border-bottom: 2px solid #acabab;
-padding-bottom: 20px;
+    padding-bottom: 20px;
 }
 
 .reply-parent-btn-list {
@@ -457,6 +459,7 @@ padding-bottom: 20px;
     text-align: center;
     border-bottom:1px solid #dbd9d9;
     padding-top: 14px;
+    margin-bottom: 100px;
 }
 
 .users-list-username {
@@ -490,6 +493,7 @@ padding-bottom: 20px;
     text-align: center;
     margin: 56px 0;
     border-bottom:1px solid #dbd9d9;
+    margin-bottom: 100px;
 }
 
 .edit-user {
@@ -535,6 +539,10 @@ padding-bottom: 20px;
 .bm-main {
     display: flex;
     min-height: 100vh;
+    border-bottom:1px solid #dbd9d9;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    margin-bottom: 100px;
 }
 .bm-contents {
     width: 700px;
@@ -550,7 +558,7 @@ padding-bottom: 20px;
 }
 
 .bm-icon p {
-margin: 8px 0;
+    margin: 8px 0;
 
 }
 
@@ -571,6 +579,7 @@ margin: 8px 0;
 .category-name-list {
     list-style: none;
     padding: 0;
+    margin-bottom: 30px;
 }
 
 .category-name-list li {

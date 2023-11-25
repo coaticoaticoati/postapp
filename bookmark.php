@@ -1,5 +1,5 @@
 <?php
-ini_set("display_errors", "OFF");
+//ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 
@@ -11,18 +11,22 @@ if (empty($_SESSION)) {
 
 $redirect_back = 'Location: bookmark.php';
 
+// ログインユーザーの全てのカテゴリー名とそのidを取得
+$category_ids = get_category_ids();
+
 // データベース接続
 $dbh = db_open();
 
 // 新規のカテゴリー名を登録
-if (isset($_POST['insert_category'])) {
-    insert_category_name($_POST['insert_category']);
+if (isset($_POST['category_name'])) {
+    insert_category_name($_POST['category_name']);
     header($redirect_back);
     exit;
 }
 
+
 // ブックマークに登録済みの投稿と返信を取得
-$sql ='SELECT bookmarks.id, posts.post_id, bookmarks.post_id, pressed_at, created_at, content, bookmarks.user_id, posts.file_path
+$sql ='SELECT bookmarks.id, posts.post_id, bookmarks.post_id, pressed_at, created_at, content, posts.user_id, posts.file_path
 FROM bookmarks 
 INNER JOIN posts ON bookmarks.post_id = posts.post_id
 WHERE bookmarks.user_id = :user_id
@@ -33,7 +37,7 @@ $bm_post_stmt->execute();
 while ($bm_post_row = $bm_post_stmt->fetch()) { 
     $bookmarks[] = $bm_post_row;
 }
-$sql ='SELECT bookmarks.id, replies.reply_id, bookmarks.reply_id, bookmarks.pressed_at, created_at, content, bookmarks.user_id
+$sql ='SELECT bookmarks.id, replies.reply_id, bookmarks.reply_id, pressed_at, created_at, content, replies.user_id
 FROM bookmarks 
 INNER JOIN replies ON bookmarks.reply_id = replies.reply_id
 WHERE bookmarks.user_id = :user_id
@@ -45,16 +49,128 @@ while ($bm_rep_row = $bm_rep_stmt->fetch()) {
     $bookmarks[] = $bm_rep_row;
 }
 
+// 投稿と返信をまとめた$bookmarksを押された順に並び変える
+if (isset($bookmarks)) {
+    array_multisort(array_map('strtotime', array_column($bookmarks, 'pressed_at')), SORT_DESC, $bookmarks) ;
+}
+
 // 投稿または返信をカテゴリーに追加
-if (isset($_POST['ins_posts_to_categ'])) {
-    $sql = 'INSERT IGNORE INTO bookmarks (post_id, reply_id, user_id, category_id) 
-    VALUES (:post_id, :reply_id, :user_id, :category_id)';
-    $bm_ins_stmt = $dbh->prepare($sql);
-    $bm_ins_stmt->bindValue(':category_id', $_POST['ins_posts_to_categ'], PDO::PARAM_INT);
-    $bm_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
-    $bm_ins_stmt->bindValue(':post_id', $_POST['insert_bm'], PDO::PARAM_INT);
-    $bm_ins_stmt->bindValue(':reply_id', $_POST['insert_rep_bm'], PDO::PARAM_INT);
-    $bm_ins_stmt->execute();
+if (isset($_POST['ids']) && is_array($_POST['ids'])) {
+    foreach ($_POST['ids'] as $bm_id) {
+        $sql = 'SELECT post_id, reply_id FROM bookmarks
+        WHERE id = :id';
+        $bm_stmt = $dbh->prepare($sql);
+        $bm_stmt->bindValue(':id', $bm_id, PDO::PARAM_INT);
+        $bm_stmt->execute();
+        $post_rep_id = $bm_stmt->fetch();
+
+        if (empty($post_rep_id['post_id'])) {
+            $sql = 'INSERT IGNORE INTO bookmarks (reply_id, user_id, category_id) 
+            VALUES (:reply_id, :user_id, :category_id)';
+            $ins_rep_stmt = $dbh->prepare($sql);
+            $ins_rep_stmt->bindValue(':reply_id', $post_rep_id['reply_id'], PDO::PARAM_INT);
+            $ins_rep_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+            $ins_rep_stmt->bindValue(':category_id', $_POST['category_id'], PDO::PARAM_INT);
+            $ins_rep_stmt->execute();
+        } else {
+            $sql = 'INSERT IGNORE INTO bookmarks (post_id, user_id, category_id) 
+            VALUES (:post_id, :user_id, :category_id)';
+            $ins_post_stmt = $dbh->prepare($sql);
+            $ins_post_stmt->bindValue(':post_id', $post_rep_id['post_id'], PDO::PARAM_INT);
+            $ins_post_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+            $ins_post_stmt->bindValue(':category_id', $_POST['category_id'], PDO::PARAM_INT);
+            $ins_post_stmt->execute();
+        }
+    }
+    header($redirect_back);
+    exit;
+}
+
+// 投稿文の返信ボタンが押された場合
+if (isset($_POST['reply_btn_post'])) {
+    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_post'];
+    header('Location: reply.php');
+    exit;
+}
+
+// 削除ボタンが押された場合
+if (isset($_POST['delete_post'])) {
+    delete_post((int)$_POST['delete_post']);
+    header($redirect_back);
+    exit;  
+}
+
+// いいねボタンが押された場合
+if (isset($_POST['insert_like'])) {
+    insert_like((int)$_POST['insert_like']);
+    header($redirect_back);
+    exit;
+}
+
+// いいね解除ボタンが押された場合
+if (isset($_POST['delete_like'])) {
+    delete_like((int)$_POST['delete_like']);
+    header($redirect_back);
+    exit;
+}
+
+// ブックマークボタンが押された場合
+if (isset($_POST['insert_bm'])) {
+    insert_bookmark((int)$_POST['insert_bm']);
+    header($redirect_back);
+    exit;
+}
+
+// ブックマーク解除ボタンが押された場合
+if (isset($_POST['delete_bm'])) {
+    delete_bookmark((int)$_POST['delete_bm']);
+    header($redirect_back);
+    exit;
+}
+
+// -------返信-------
+
+// 返信文の返信ボタンが押された場合
+if (isset($_POST['reply_btn_reply'])) {
+    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_reply'];
+    $_SESSION['reply_btn_reply_id'] = (int)$_POST['reply_btn_reply_id'];
+    header('Location: reply.php#reply');
+    exit;
+}
+
+// いいねが押された場合
+if (isset($_POST['insert_reply_like'])) {
+    insert_reply_like((int)$_POST['insert_reply_like']);
+    header($redirect_back);
+    exit;
+}
+
+// いいね解除ボタンが押された場合
+if (isset($_POST['delete_reply_like'])) {
+    delete_reply_like((int)$_POST['delete_reply_like']);
+    header($redirect_back);
+    exit;
+}
+
+// 削除ボタンが押された場合
+if (isset($_POST['delete_reply'])) {
+    delete_reply($_POST['delete_reply']);
+    header($redirect_back);
+    exit;
+}
+
+// ブックマークボタンが押された場合
+if (isset($_POST['insert_reply_bm'])) {
+    insert_rep_bookmark((int)$_POST['insert_reply_bm']);
+    header($redirect_back);
+    exit;
+}
+
+// ブックマーク解除ボタンが押された場合
+if (isset($_POST['delete_reply_bm'])) {
+    delete_rep_bookmark((int)$_POST['delete_reply_bm']);
+    header($redirect_back);
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -82,18 +198,22 @@ if (isset($_POST['ins_posts_to_categ'])) {
                 <!-- 左サイドバー -->
                 <div class="left-side">
                     <!-- カテゴリー一覧 -->
-                    <?php
-                    // 全てのカテゴリー名を取得
-                    $category_names = get_category_names();
-                    ?>
                     <div class="left-side-bar">
                         <p>カテゴリーリスト</p>
                         <ul class="category-name-list">
-                            <?php foreach ($category_names as $category_name) : ?>
-                                <li><a href="category.php?id=<?= h($category_name['id']) ?>"><span>●</span><?= h($category_name['name']) ?></a></li>
+                            <?php foreach ($category_ids as $category_id) : ?>
+                                <li><a href="category.php?id=<?= h($category_id['id']) ?>"><span>●</span><?= h($category_id['name']) ?></a></li>
                             <?php endforeach ?>  
                         </ul>
-                    </div>    
+                        <!-- カテゴリー名を追加  -->
+                        <div class="">
+                            <form action="" method="post">
+                                <p>カテゴリーを追加する</p>
+                                <input type="text" name="category_name">
+                                <button type="submit">登録</button>
+                            </form>
+                        </div>
+                    </div>   
                 </div>
 
                 <!-- ブックマーク一覧 -->
@@ -102,9 +222,7 @@ if (isset($_POST['ins_posts_to_categ'])) {
                         
                         <!-- チェックボックス -->
                         <div class="check-box">
-                            <input type="hidden" form="category" name="insert_bm" value="<?= h($bookmark['post_id']) ?>">
-                            <input type="hidden" form="category" name="insert_rep_bm" value="<?= h($bookmark['reply_id']) ?>">
-                            <input type="checkbox" form="category" name="id" value="<?= h($bookmark['id']) ?>">
+                            <input type="checkbox" form="category" name="ids[]" value="<?= h($bookmark['id']) ?>">
                         </div>
 
                         <!-- アイコン -->
@@ -253,22 +371,13 @@ if (isset($_POST['ins_posts_to_categ'])) {
                 <!-- 右サイドバー -->
                 <div class="right-side">
                     <div class="right-side-bar">
-                        <div class="">
-                            <!--  -->
-                            <form action="" method="post">
-                                <p>カテゴリーを追加する</p>
-                                <input type="text" name="insert_category">
-                                <button type="submit">登録</button>
-                            </form>
-                        </div>
-
                         <!-- 投稿または返信をカテゴリーリストに追加 -->
                         <form action="" method="post" id="category">
                             <p>リストに追加する</p>
-                            <select name="ins_posts_to_categ">
+                            <select name="category_id">
                                 <option value=""></option>
-                                <?php foreach ($category_names as $category_name) : ?>
-                                    <option value="<?= h($category_name['id']) ?>"><?= h($category_name['name']) ?></option>
+                                <?php foreach ($category_ids as $category_id) : ?>
+                                    <option value="<?= h($category_id['id']) ?>"><?= h($category_id['name']) ?></option>
                                 <?php endforeach ?>    
                             </select>
                             <button type="submit">登録</button>

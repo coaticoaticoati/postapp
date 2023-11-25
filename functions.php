@@ -392,19 +392,19 @@ function insert_category_name($insert_category_name) {
     $category_ins_stmt->execute();
 }
 
-// ログインユーザーの全てのカテゴリー名を取得
-function get_category_names() {
+// ログインユーザーの全てのカテゴリー名とそのidを取得
+function get_category_ids() {
     $dbh = db_open();
     $sql ='SELECT id, name FROM categories
     WHERE user_id = :user_id
     ORDER BY created_at ASC';
-    $category_name_stmt = $dbh->prepare($sql);
-    $category_name_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
-    $category_name_stmt->execute();
-    while ($category_name_row = $category_name_stmt->fetch()) { 
-        $category_names[] = $category_name_row;
+    $category_id_stmt = $dbh->prepare($sql);
+    $category_id_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $category_id_stmt->execute();
+    while ($category_id_row = $category_id_stmt->fetch()) { 
+        $category_ids[] = $category_id_row;
     }
-    return $category_names;
+    return $category_ids;
 }
 
 // ----------フォロー、フォロワー、アンフォロー-------

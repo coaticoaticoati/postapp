@@ -1,5 +1,5 @@
 <?php
-ini_set("display_errors", "OFF");
+//ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 
@@ -11,12 +11,80 @@ if (empty($_SESSION)) {
 
 $redirect_back = 'Location: category.php';
 
-// -------投稿-------
+// データベース接続
+$dbh = db_open();
+
+// カテゴリーIDを代入
+$category_id = $_GET['id'];
+
+// 全てのカテゴリー名とそのidをを取得
+$category_ids = get_category_ids();
+
+
+// 新規のカテゴリー名を登録
+if (isset($_POST['insert_category'])) {
+    insert_category_name($_POST['insert_category']);
+    header('Location: bookmark.php');
+    exit;
+}
+
+// カテゴリー名を取得
+$sql ='SELECT name FROM categories
+WHERE id = :id';
+$category_title_stmt = $dbh->prepare($sql);
+$category_title_stmt->bindValue(':id', $category_id, PDO::PARAM_INT);
+$category_title_stmt->execute();
+$category_title = $category_title_stmt->fetch();
+
+
+// カテゴリーに登録済みの投稿、返信を取得
+$sql ='SELECT bookmarks.id, bookmarks.post_id, posts.file_path, pressed_at, posts.created_at, content, posts.user_id
+FROM bookmarks 
+INNER JOIN posts ON bookmarks.post_id = posts.post_id
+INNER JOIN categories ON bookmarks.category_id = categories.id
+WHERE category_id = :category_id';
+$category_post_stmt = $dbh->prepare($sql);
+$category_post_stmt->bindValue(':category_id', $category_id, PDO::PARAM_INT);
+$category_post_stmt->execute();
+while ($category_post_row = $category_post_stmt->fetch()) {
+    $categories[] = $category_post_row;
+}
+
+$sql ='SELECT bookmarks.id, bookmarks.reply_id, pressed_at, replies.created_at, content, replies.user_id
+FROM bookmarks 
+INNER JOIN replies ON bookmarks.reply_id = replies.reply_id
+INNER JOIN categories ON bookmarks.category_id = categories.id
+WHERE category_id = :category_id';
+$category_rep_stmt = $dbh->prepare($sql);
+$category_rep_stmt->bindValue(':category_id', $category_id, PDO::PARAM_INT);
+$category_rep_stmt->execute();
+while ($category_rep_row = $category_rep_stmt->fetch()) {
+    $categories[] = $category_rep_row;
+}
+
+// 投稿と返信をまとめた$bookmarksを押された順に並び変える
+if (isset($categories)) {
+    array_multisort(array_map('strtotime', array_column($categories, 'pressed_at')), SORT_DESC, $categories) ;
+}
+
+
+// 投稿または返信をカテゴリーから削除
+if (isset($_POST['ids']) && is_array($_POST['ids'])) {
+    foreach ($_POST['ids'] as $bm_id) {
+        $sql = 'DELETE FROM bookmarks
+        WHERE id = :id';
+        $delete_category_stmt = $dbh->prepare($sql);
+        $delete_category_stmt->bindValue(':id', $bm_id, PDO::PARAM_INT);
+        $delete_category_stmt->execute();
+    }
+    header($redirect_back);
+    exit;
+}
 
 // 投稿文の返信ボタンが押された場合
 if (isset($_POST['reply_btn_post'])) {
     $_SESSION['reply_btn'] = (int)$_POST['reply_btn_post'];
-    header('Location: reply.php#reply');
+    header('Location: reply.php');
     exit;
 }
 
@@ -100,50 +168,6 @@ if (isset($_POST['delete_reply_bm'])) {
     exit;
 }
 
-// データベース接続
-$dbh = db_open();
-
-// カテゴリーIDを代入
-$category_id =  $_GET['id'];
-
-// 新規のカテゴリー名を登録
-if (isset($_POST['insert_category'])) {
-    insert_category_name($_POST['insert_category']);
-    header('Location: bookmark.php');
-    exit;
-}
-
-// カテゴリー名を取得
-$sql ='SELECT name FROM categories
-WHERE id = :id';
-$category_title_stmt = $dbh->prepare($sql);
-$category_title_stmt->bindValue(':id', $category_id, PDO::PARAM_INT);
-$category_title_stmt->execute();
-$category_title = $category_title_stmt->fetch();
-
-// カテゴリーに登録済みの投稿、返信を取得
-$sql ='SELECT bookmarks.user_id, bookmarks.post_id, bookmarks.reply_id, posts.file_path,
-posts.content AS p_content, posts.created_at AS p_created_at, 
-replies.content AS r_content, replies.created_at AS r_created_at
-FROM bookmarks
-INNER JOIN categories ON bookmarks.category_id = categories.id
-LEFT OUTER JOIN posts ON bookmarks.post_id = posts.post_id
-LEFT OUTER JOIN replies ON bookmarks.reply_id = replies.reply_id
-WHERE categories.id = :id
-ORDER BY bookmarks.pressed_at ASC';
-$category_stmt = $dbh->prepare($sql);
-$category_stmt->bindValue(':id', $category_id, PDO::PARAM_INT);
-$category_stmt->execute();
-
-// 投稿または返信をカテゴリーから削除
-if (isset($_POST['del_posts_from_categ'])) {
-    $sql = 'DELETE FROM bookmarks WHERE reply_id = :reply_id AND user_id = :user_id';
-    $bm_del_stmt = $dbh->prepare($sql);
-    $bm_del_stmt->bindValue(':reply_id', $delete_rep_bookmark, PDO::PARAM_INT);
-    $bm_del_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
-    $bm_del_stmt->execute();
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -170,29 +194,32 @@ if (isset($_POST['del_posts_from_categ'])) {
                 <!-- 左サイドバー -->
                 <div class="left-side">
                     <!-- カテゴリー一覧 -->
-                    <?php
-                    // 全てのカテゴリー名を取得
-                    $category_names = get_category_names();
-                    ?>
                     <div class="left-side-bar">
                         <p>カテゴリーリスト</p>
                         <ul class="category-name-list">
-                            <?php foreach ($category_names as $category_name) : ?>
-                                <li><a href="category.php?id=<?= h($category_name['id']) ?>">●<?= h($category_name['name']) ?></a></li>
+                            <?php foreach ($category_ids as $category_id) : ?>
+                                <li><a href="category.php?id=<?= h($category_id['id']) ?>">●<?= h($category_id['name']) ?></a></li>
                             <?php endforeach ?>  
                         </ul>
+                        <!-- カテゴリー名を追加  -->
+                        <div class="">
+                            <form action="" method="post">
+                                <p>カテゴリーを追加する</p>
+                                <input type="text" name="category_name">
+                                <button type="submit">登録</button>
+                            </form>
+                        </div>
                     </div>    
                 </div>
 
                 <!-- ブックマーク一覧 -->
                 <div class="bm-contents">
                     <p><?= h($category_title['name']) ?></p>
-                    <?php while ($category = $category_stmt->fetch()) : ?>
+                    <?php foreach ($categories as $category) : 
+                        var_dump($category['id']);?>
                         
                         <!-- チェックボックス -->
-                        <input type="hidden" form="category" name="delete_bm" value="<?= h($category['post_id']) ?>">
-                        <input type="hidden" form="category" name="delete_rep_bm" value="<?= h($category['reply_id']) ?>">
-                        <input type="checkbox" form="category" name="id" value="<?= h($category['id']) ?>">
+                        <input type="checkbox" form="category" name="ids[]" value="<?= h($category['id']) ?>">
                         
                         <!-- アイコン -->
                         <div class="bm-icon">
@@ -213,10 +240,10 @@ if (isset($_POST['del_posts_from_categ'])) {
                         <div class="timeline-post">
                             <!-- 返信文 -->
                             <?php if (empty($category['post_id'])) : ?>  
-                                <p>RE: <?= h($category['r_content']) ?></p>
+                                <p>RE: <?= h($category['content']) ?></p>
                             <!-- 投稿文 -->
                             <?php else : ?>
-                                <p><?= h($category['p_content']) ?></p>   
+                                <p><?= h($category['content']) ?></p>   
                             <?php endif; ?>
                         </div>
                             
@@ -230,9 +257,9 @@ if (isset($_POST['del_posts_from_categ'])) {
                         <!-- 投稿日時 -->
                         <div class="timeline-date">
                             <?php if (empty($category['post_id'])) : ?>
-                                <p><?= h($category['r_created_at']) ?></p>
+                                <p><?= h($category['created_at']) ?></p>
                             <?php else : ?>
-                                <p><?= h($category['p_created_at']) ?></p>
+                                <p><?= h($category['created_at']) ?></p>
                             <?php endif; ?>
                         </div>
 
@@ -341,30 +368,15 @@ if (isset($_POST['del_posts_from_categ'])) {
                                 <?php endif; ?>
                             </ul>    
                         </div>
-                    <?php endwhile ?>
+                    <?php endforeach ?>
                 </div>
 
                 <!-- 右サイドバー -->
                 <div class="right-side">
                     <div class="right-side-bar">
-                        <div class="">
-                            <!-- カテゴリー名を追加 -->
-                            <form action="" method="post">
-                                <p>カテゴリーを追加する</p>
-                                <input type="text" name="insert_category">
-                                <button type="submit">登録</button>
-                            </form>
-                        </div>            
-
                         <!-- 投稿または返信をカテゴリーから削除 -->
                         <form action="" method="post" id="category">
-                            <p>リストから削除する</p>
-                            <select name="del_posts_from_categ">
-                                <option value=""></option>
-                                <?php foreach ($category_names as $category_name) : ?>
-                                    <option value="<?= h($category_name['id']) ?>"><?= h($category_name['name']) ?></option>
-                                <?php endforeach ?>    
-                            </select>
+                            <label>リストから削除する</label>
                             <button type="submit">削除</button>
                         </form>
                     </div>    
