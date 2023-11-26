@@ -52,13 +52,6 @@ if (isset($posts)) {
     array_multisort($created_at_array, SORT_DESC, $user_id_array, SORT_ASC, $posts);
 }
 
-// 投稿文の返信ボタンが押された場合
-if (isset($_POST['reply_btn_post'])) {
-    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_post'];
-    header('Location: reply.php');
-    exit;
-}
-
 // 削除ボタンが押された場合
 if (isset($_POST['delete_post'])) {
     delete_post((int)$_POST['delete_post']);
@@ -95,14 +88,6 @@ if (isset($_POST['delete_bm'])) {
 }
 
 // -------返信-------
-
-// 返信文の返信ボタンが押された場合
-if (isset($_POST['reply_btn_reply'])) {
-    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_reply'];
-    $_SESSION['reply_btn_reply_id'] = (int)$_POST['reply_btn_reply_id'];
-    header('Location: reply.php#reply');
-    exit;
-}
 
 // いいねが押された場合
 if (isset($_POST['insert_reply_like'])) {
@@ -326,18 +311,9 @@ if (isset($_FILES['image'])) {
                                 <ul class="timeline-btn-list">
                                     <!-- 返信ボタン -->
                                     <?php if (isset($post['reply_id'])) : ?>
-                                        <!---post_idとreply_idをセッションに保存する -->
-                                        <form action="" method="post">
-                                            <input type="hidden" name="reply_btn_reply" value=<?= h($post['post_id']) ?>>
-                                            <input type="hidden" name="reply_btn_reply_id" value=<?= h($post['reply_id']) ?>>
-                                            <li><button type="submit">返信</button></li>
-                                        </form>
+                                        <li><button type="submit"><a href="reply.php?r_id=<?= h($post['reply_id']) ?>#reply">返信</a></button></li>
                                     <?php else : ?>
-                                        <!-- post_idをセッションに保存する -->
-                                        <form action="" method="post">
-                                            <input type="hidden" name="reply_btn_post" value=<?= h($post['post_id']) ?>>
-                                            <li><button type="submit">返信</button></li>
-                                        </form>
+                                        <li><button type="submit"><a href="reply.php?p_id=<?= h($post['post_id']) ?>#reply">返信</a></button></li>
                                     <?php endif; ?>
 
                                     <!-- アカウントボタン -->

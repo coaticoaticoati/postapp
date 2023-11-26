@@ -12,18 +12,10 @@ if (empty($_SESSION)) {
 // データベース接続
 $dbh = db_open();
 
-// 
+// user_idを代入
 $user_id = (int)$_GET['id'];
 
-//
 $redirect_url = 'user.php?id='.$user_id;
-
-// 返信ボタンが押された場合
-if (isset($_POST['reply_btn'])) {
-    $_SESSION['reply_btn'] = (int)$_POST['reply_btn'];
-    header('Location: reply.php');
-    exit;
-}
 
 // -----プロフィール------
 
@@ -310,10 +302,7 @@ if (isset($_POST['block_user'])) {
                             <div class="user-post-buttons">
                                 <ul class="user-post-btn-list">
                                     <!-- 返信ボタン -->
-                                    <form action="" method="post">
-                                        <input type="hidden" name="reply_btn" value=<?= h($post_row['post_id']) ?>>  
-                                        <li><input type="submit" value="返信" class="user-button"></li>
-                                    </form>
+                                    <li><button class="user-button"><a href="reply.php?p_id=<?= h($post_row['post_id']) ?>#reply">返信</a></button></li>
 
                                     <!-- アカウントボタン -->
                                     <li><button class="user-button"><a href="user.php?id=<?= h($post_row['user_id']) ?>">アカウント</a></button></li>
@@ -388,10 +377,7 @@ if (isset($_POST['block_user'])) {
                             <div class="user-post-buttons">
                                 <ul class="user-post-btn-list">
                                     <!-- 返信ボタン -->
-                                    <form action="" method="post">
-                                        <input type="hidden" name="reply_btn" value=<?= h($reply_row['post_id']) ?>>  
-                                        <li><input type="submit" value="返信" class="user-button"></li>
-                                    </form>
+                                    <li><button class="user-button"><a href="reply.php?p_id=<?= h($reply_row['post_id']) ?>#reply">返信</a></button></li>
 
                                     <!-- アカウントボタン -->
                                     <li><button class="user-button"><a href="user.php?id=<?= h($reply_row['user_id']) ?>">アカウント</a></button></li>
@@ -480,10 +466,7 @@ if (isset($_POST['block_user'])) {
                                 <div class="user-post-buttons">
                                     <ul class="user-post-btn-list">
                                         <!-- 返信ボタン -->
-                                        <form action="" method="post">
-                                            <input type="hidden" name="reply_btn" value=<?= h($post_like_rep['post_id']) ?>>  
-                                            <li><input type="submit" value="返信" class="user-button"></li>
-                                        </form>
+                                        <li><button class="user-button"><a href="reply.php?p_id=<?= h($post_like_rep['post_id']) ?>#reply">返信</a></button></li>
 
                                         <!-- アカウントボタン -->
                                         <li><button class="user-button"><a href="user.php?id=<?= h($post_like_rep['user_id']) ?>">アカウント</a></button></li>

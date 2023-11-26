@@ -1,5 +1,5 @@
 <?php
-//ini_set("display_errors", "OFF");
+ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 
@@ -19,14 +19,6 @@ $category_id = $_GET['id'];
 
 // 全てのカテゴリー名とそのidをを取得
 $category_ids = get_category_ids();
-
-
-// 新規のカテゴリー名を登録
-if (isset($_POST['insert_category'])) {
-    insert_category_name($_POST['insert_category']);
-    header('Location: bookmark.php');
-    exit;
-}
 
 // カテゴリー名を取得
 $sql ='SELECT name FROM categories
@@ -73,20 +65,31 @@ if (isset($_POST['ids']) && is_array($_POST['ids'])) {
     foreach ($_POST['ids'] as $bm_id) {
         $sql = 'DELETE FROM bookmarks
         WHERE id = :id';
-        $delete_category_stmt = $dbh->prepare($sql);
-        $delete_category_stmt->bindValue(':id', $bm_id, PDO::PARAM_INT);
-        $delete_category_stmt->execute();
+        $delete_posts_stmt = $dbh->prepare($sql);
+        $delete_posts_stmt->bindValue(':id', $bm_id, PDO::PARAM_INT);
+        $delete_posts_stmt->execute();
     }
     header($redirect_back);
     exit;
 }
 
-// 投稿文の返信ボタンが押された場合
-if (isset($_POST['reply_btn_post'])) {
-    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_post'];
-    header('Location: reply.php');
+// 現在のページのカテゴリーとその投稿を削除（投稿はブックマークに残る）
+if (isset($_POST['delete_categ'])) {
+    $sql = 'DELETE FROM categories
+    WHERE id = :id';
+    $delete_categ_name_stmt = $dbh->prepare($sql);
+    $delete_categ_name_stmt->bindValue(':id', $category_id, PDO::PARAM_INT);
+    $delete_categ_name_stmt->execute();
+
+    $sql = 'DELETE FROM bookmarks
+    WHERE category_id = :category_id';
+    $delete_categ_posts_stmt = $dbh->prepare($sql);
+    $delete_categ_posts_stmt->bindValue(':category_id', $category_id, PDO::PARAM_INT);
+    $delete_categ_posts_stmt->execute();
+    header($redirect_back);
     exit;
 }
+
 
 // 削除ボタンが押された場合
 if (isset($_POST['delete_post'])) {
@@ -124,14 +127,6 @@ if (isset($_POST['delete_bm'])) {
 }
 
 // -------返信-------
-
-// 返信文の返信ボタンが押された場合
-if (isset($_POST['reply_btn_reply'])) {
-    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_reply'];
-    $_SESSION['reply_btn_reply_id'] = (int)$_POST['reply_btn_reply_id'];
-    header('Location: reply.php#reply');
-    exit;
-}
 
 // いいねが押された場合
 if (isset($_POST['insert_reply_like'])) {
@@ -201,26 +196,19 @@ if (isset($_POST['delete_reply_bm'])) {
                                 <li><a href="category.php?id=<?= h($category_id['id']) ?>">●<?= h($category_id['name']) ?></a></li>
                             <?php endforeach ?>  
                         </ul>
-                        <!-- カテゴリー名を追加  -->
-                        <div class="">
-                            <form action="" method="post">
-                                <p>カテゴリーを追加する</p>
-                                <input type="text" name="category_name">
-                                <button type="submit">登録</button>
-                            </form>
-                        </div>
                     </div>    
                 </div>
 
                 <!-- ブックマーク一覧 -->
                 <div class="bm-contents">
-                    <p><?= h($category_title['name']) ?></p>
-                    <?php foreach ($categories as $category) : 
-                        var_dump($category['id']);?>
+                    <h4><?= h($category_title['name']) ?></h4>
+                    <?php foreach ($categories as $category) : ?>
                         
                         <!-- チェックボックス -->
-                        <input type="checkbox" form="category" name="ids[]" value="<?= h($category['id']) ?>">
-                        
+                        <div class="check-box">
+                            <input type="checkbox" form="category" name="ids[]" value="<?= h($category['id']) ?>">
+                        </div>
+
                         <!-- アイコン -->
                         <div class="bm-icon">
                             <?php
@@ -275,18 +263,9 @@ if (isset($_POST['delete_reply_bm'])) {
                             <ul class="timeline-btn-list">
                                 <!-- 返信ボタン -->
                                 <?php if (isset($category['reply_id'])) : ?>
-                                    <!---post_idとreply_idをセッションに保存する -->
-                                    <form action="" method="post">
-                                        <input type="hidden" name="reply_btn_reply" value=<?= h($category['post_id']) ?>>
-                                        <input type="hidden" name="reply_btn_reply_id" value=<?= h($category['reply_id']) ?>>
-                                        <li><button type="submit">返信</button></li>
-                                    </form>
+                                    <li><button type="submit"><a href="reply.php?r_id=<?= h($category['reply_id']) ?>#reply">返信</a></button></li>
                                 <?php else : ?>
-                                    <!-- post_idをセッションに保存する -->
-                                    <form action="" method="post">
-                                        <input type="hidden" name="reply_btn_post" value=<?= h($category['post_id']) ?>>
-                                        <li><button type="submit">返信</button></li>
-                                    </form>
+                                    <li><button type="submit"><a href="reply.php?p_id=<?= h($category['post_id']) ?>#reply">返信</a></button></li>
                                 <?php endif; ?>
 
                                 <!-- アカウントボタン -->
@@ -375,10 +354,20 @@ if (isset($_POST['delete_reply_bm'])) {
                 <div class="right-side">
                     <div class="right-side-bar">
                         <!-- 投稿または返信をカテゴリーから削除 -->
-                        <form action="" method="post" id="category">
-                            <label>リストから削除する</label>
-                            <button type="submit">削除</button>
-                        </form>
+                        <div class="">
+                            <form action="" method="post" id="category">
+                                <label>投稿をリストから削除する</label>
+                                <button type="submit">削除</button>
+                            </form>
+                        </div>    
+                        <!-- カテゴリーを削除する -->
+                        <div class="categ-delete">
+                            <form action="" method="post">
+                                <label><?= h($category_title['name']) ?>カテゴリーを削除する</label>
+                                <button type="submit" name="delete_categ">削除</button>
+                            </form>  
+                        </div>             
+
                     </div>    
                 </div>        
 

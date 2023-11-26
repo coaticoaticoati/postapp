@@ -12,9 +12,23 @@ if (empty($_SESSION)) {
 // データベース接続
 $dbh = db_open();
 
+// post_id、post_idを代入
+$post_id = $_GET['p_id'];
+$reply_id = $_GET['r_id'];
+
+// 返信ボタンが押されてこのページに飛んできた場合、親投稿のid（$post_id）はパラメータに付与されていないため、取得する
+if (empty($post_id)) {
+    $sql = 'SELECT post_id FROM replies WHERE reply_id = :reply_id';
+    $post_id_stmt = $dbh->prepare($sql);
+    $post_id_stmt->bindValue(':reply_id', $_SESSION['reply_btn_reply_id'], PDO::PARAM_INT);
+    $post_id_stmt->execute();
+    $post_id = $post_id_stmt->fetch();
+    $post_id = $post_id['post_id'];
+}
+
 $redirect_back = 'Location: reply.php';
 
-// -------投稿-------
+// ------- 投稿 -------
 
 // いいねが押された場合
 if (isset($_POST['insert_like'])) {
@@ -51,7 +65,7 @@ if (isset($_POST['delete_bm'])) {
     exit;
 }
 
-// -------返信-------
+// ------- 返信 -------
 
 // いいねが押された場合
 if (isset($_POST['insert_reply_like'])) {
@@ -88,7 +102,23 @@ if (isset($_POST['delete_reply_bm'])) {
     exit;
 }
 
-// ------いいね-----
+// 親投稿に対する返信全件を取得し、ツリー構造を構築
+
+$reply_stmt = get_reply($post_id);
+$all_replies = $reply_stmt->fetchAll();
+$reply_tree = build_reply_tree($all_replies);
+function build_reply_tree($all_replies, $parent_id = null) {
+    $tree = [];
+    foreach ($all_replies as $reply) {
+        if ($reply['reply_reply_id'] === $parent_id) {
+            $reply['replies'] = build_reply_tree($all_replies, $reply['reply_id']);
+            $tree[] = $reply;
+        }
+    }
+    return $tree;
+}
+
+// ------ いいね -----
 
 // 投稿へログインユーザーが行った、いいね全件を取得
 $sql = 'SELECT post_is_liked_id FROM likes INNER JOIN posts ON likes.post_is_liked_id = posts.post_id
@@ -110,7 +140,7 @@ while ($reply_like_row = $reply_like_stmt->fetch()) {
     $reply_likes[] = $reply_like_row;
 }
 
-// バリデーション
+// ------ バリデーション -------
 
 // 親投稿への返信フォーム
 
@@ -128,13 +158,12 @@ if(strlen($_POST['reply_form']) > 600) {
 if (isset($_POST['reply_form'])) {
     if(empty($reply_error)) { 
         insert_reply((int)$_POST['post_id'], $_POST['reply_form']);
-        header('Location: reply.php'); // 自動リダイレクト
+        header('Location: reply.php');
         exit;
     }
 }
 
 // 返信への返信フォーム
-
 
 // 空文字の場合
 if($_POST['reply_reply_form'] === '') {
@@ -153,28 +182,12 @@ if(strlen($_POST['reply_reply_form']) > 200) {
 if (isset($_POST['reply_reply_form'])) {
     if(empty($reply_reply_error)) { 
         insert_reply_reply((int)$_POST['post_id'], $_POST['reply_reply_form'], (int)$_POST['reply_id']);
-        header('Location: reply.php'); // 自動リダイレクト
+        header('Location: reply.php');
         exit;
     }
 }
 
-// 親投稿に対する返信全件を取得し、ツリー構造を構築
-
-$reply_stmt = get_reply($_SESSION['reply_btn']);
-$all_replies = $reply_stmt->fetchAll();
-$reply_tree = build_reply_tree($all_replies);
-function build_reply_tree($all_replies, $parent_id = null) {
-    $tree = [];
-    foreach ($all_replies as $reply) {
-        if ($reply['reply_reply_id'] === $parent_id) {
-            $reply['replies'] = build_reply_tree($all_replies, $reply['reply_id']);
-            $tree[] = $reply;
-        }
-    }
-    return $tree;
-}
-
-// -------ブロック---------
+// ------- ブロック ---------
 
 // ログインユーザーがブロックしている、ログインユーザーをブロックしているユーザーを取得
 // 投稿を表示せず、「表示できません」のメッセージをつける
@@ -211,7 +224,8 @@ while ($block_row = $block_stmt->fetch()) {
                     <!-- 親投稿 -->
                     <div class="reply-parent">
                         <?php
-                        $post_row = get_posts($_SESSION['reply_btn']);
+                        // 親投稿を取得
+                        $post_row = get_posts($post_id);
                         // ブロックしている、されているか確認
                         $block_reply = true;
                         foreach ($blocks as $block) {
@@ -220,14 +234,17 @@ while ($block_row = $block_stmt->fetch()) {
                             }
                         }
                         // ブロックしている、されている場合
-                        if ($block_reply === false) : ?>    
+                        if ($block_reply === false) : 
+                        ?>    
                             <p class="block-post">このポストは表示できません。</p>
 
-                        <?php else : // ブロックしていない、されていない場合
-
-                            // 親投稿が削除された場合
-                            if ($post_row === false) : ?>
+                        <!-- ブロックしていない、されていない場合 -->    
+                        <?php else : ?>
+                            <!-- 親投稿が削除された場合 -->    
+                            <?php if (empty($post_row)) : ?>
                                 <p class="block-post">このポストは削除されました。</P>
+
+                            <!-- 親投稿が削除されていない場合 -->    
                             <?php else : ?>
                                 <!-- アイコン -->
                                 <?php $icon_row = get_icon($post_row['user_id']) ?>
@@ -346,8 +363,8 @@ while ($block_row = $block_stmt->fetch()) {
                                         <div class="reply-child">
                                             <!-- アイコン -->
                                             <?php $icon_row = get_icon($reply['user_id']) ?>
-                                            <!-- index.phpにて返信ボタンを押すと対象の投稿へ飛ぶようにする-->
-                                            <?php if ($_SESSION['reply_btn_reply_id'] === $reply['reply_id']) : ?>
+                                            <!-- index.php等にて返信ボタンを押すと対象の投稿へ飛ぶようにする-->
+                                            <?php if ($reply_id === $reply['reply_id']) : ?>
                                                 <?php if (empty($icon_row)) : ?>
                                                     <p id="reply"><img src="images/animalface_tanuki.png" class="icon"><p>
                                                     <?php else : ?>    
@@ -366,18 +383,18 @@ while ($block_row = $block_stmt->fetch()) {
                                         </div>
 
                                         <!-- 返信文 -->
-                                        <p><?= h(str_repeat('→ ', $depth). $reply['content']) ?></p>
+                                        <p class="reply-content"><?= h(str_repeat('→ ', $depth). $reply['content']) ?></p>
 
                                         <!-- 日時 -->
-                                        <p><?= h($reply['created_at']) ?></p>
+                                        <p class="reply-date"><?= h($reply['created_at']) ?></p>
 
                                         <!--　いいねの数　-->
-                                        <p class="timeline-likes"><img src="images/heart.png"><?= h(get_rep_likes_number($reply['reply_id'])) ?></p>
+                                        <p class="timeline-likes"><img src="images/heart.png"> <?= h(get_rep_likes_number($reply['reply_id'])) ?></p>
                             
                                         <div class="reply-child-buttons">
                                             <ul class="reply-child-btn-list">
                                                 <!-- アカウントボタン -->
-                                                <li><button><a href="user.php?id=<?= h($reply['user_id']) ?>">アカウント</a></button></li>
+                                                <li><button class="user-button"><a href="user.php?id=<?= h($reply['user_id']) ?>">アカウント</a></button></li>
 
                                                 <!-- いいねボタン -->
                                                 <form action="" method="post">
@@ -393,10 +410,10 @@ while ($block_row = $block_stmt->fetch()) {
                                                     ?>
                                                     <?php if ($is_liked) : ?>
                                                         <input type="hidden" name="delete_reply_like" value=<?= h($reply['reply_id']) ?>>
-                                                        <li><button type="submit">いいね解除</button></li>
+                                                        <li><button type="submit" class="user-button">いいね解除</button></li>
                                                     <?php else : ?>
                                                         <input type="hidden" name="insert_reply_like" value=<?= h($reply['reply_id']) ?>>
-                                                        <li><button type="submit">いいね</button></li>
+                                                        <li><button type="submit" class="user-button">いいね</button></li>
                                                     <?php endif; ?> 
                                                 </form>
 
@@ -405,10 +422,10 @@ while ($block_row = $block_stmt->fetch()) {
                                                 <form action="" method="post">
                                                     <?php if ($reply_bm_id) : ?>
                                                         <input type="hidden" name="delete_reply_bm" value=<?= h($reply['reply_id']) ?>>
-                                                        <li><button type="submit">ブックマーク解除</button></li>
+                                                        <li><button type="submit" class="user-button">ブックマーク解除</button></li>
                                                     <?php else : ?>
                                                         <input type="hidden" name="insert_reply_bm" value=<?= h($reply['reply_id']) ?>>
-                                                        <li><button type="submit">ブックマーク</button></li>
+                                                        <li><button type="submit" class="user-button">ブックマーク</button></li>
                                                     <?php endif; ?>                         
                                                 </form>
 
@@ -416,7 +433,7 @@ while ($block_row = $block_stmt->fetch()) {
                                                 <?php if($reply['user_id'] === $_SESSION['login']['member_id']) : ?>
                                                     <form action="" method="post">
                                                         <input type="hidden" name="delete_reply" value=<?= h($reply['reply_id']) ?>>
-                                                        <li><button type="submit">削除</button></li>
+                                                        <li><button type="submit" class="user-button">削除</button></li>
                                                     </form>
                                                 <?php endif; ?>
                                             </ul>

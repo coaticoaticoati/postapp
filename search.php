@@ -6,13 +6,6 @@ session_start();
 // データベース接続
 $dbh = db_open();
 
-// 返信ボタンが押された場合
-if (isset($_POST['reply_btn'])) {
-    $_SESSION['reply_btn'] = (int)$_POST['reply_btn'];
-    header('Location: reply.php');
-    exit;
-}
-
 // -------検索------
 
 if (isset($_POST['search'])) {
@@ -185,11 +178,8 @@ while ($block_row = $block_stmt->fetch()) {
                                     <div class="search-buttons">
                                         <ul class="search-btn-list">
                                             <!-- 返信ボタン -->
-                                            <form action="" method="post">
-                                                <input type="hidden" name="reply_btn" value=<?= h($search_post['post_id']) ?>>
-                                                <li><button type="submit">返信</button></li>
-                                            </form>
-                                    
+                                            <li><button type="submit"><a href="reply.php?p_id=<?= h($search_post['post_id']) ?>#reply">返信</a></button></li>
+
                                             <!-- アカウントボタン -->
                                             <li><button type="submit"><a href="user.php?id=<?= h($search_post['member_id']) ?>">アカウント</a></button></li>
                                             

@@ -1,5 +1,5 @@
 <?php
-//ini_set("display_errors", "OFF");
+ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 
@@ -17,13 +17,24 @@ $category_ids = get_category_ids();
 // データベース接続
 $dbh = db_open();
 
-// 新規のカテゴリー名を登録
-if (isset($_POST['category_name'])) {
-    insert_category_name($_POST['category_name']);
-    header($redirect_back);
-    exit;
+// カテゴリー名のバリデーション
+// 投稿文が未入力か
+if($_POST['category_name'] === '') {
+    $error['category_name'] = 'blank';
+}
+// 投稿文が200字以内か
+if(strlen($_POST['category_name']) > 60) {
+    $error['category_name'] = 'over';
 }
 
+// 新規のカテゴリー名を登録
+if (isset($_POST['category_name'])) {
+    if(empty($error)) { 
+        insert_category_name($_POST['category_name']);
+        header($redirect_back);
+        exit;
+    }
+}
 
 // ブックマークに登録済みの投稿と返信を取得
 $sql ='SELECT bookmarks.id, posts.post_id, bookmarks.post_id, pressed_at, created_at, content, posts.user_id, posts.file_path
@@ -86,13 +97,6 @@ if (isset($_POST['ids']) && is_array($_POST['ids'])) {
     exit;
 }
 
-// 投稿文の返信ボタンが押された場合
-if (isset($_POST['reply_btn_post'])) {
-    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_post'];
-    header('Location: reply.php');
-    exit;
-}
-
 // 削除ボタンが押された場合
 if (isset($_POST['delete_post'])) {
     delete_post((int)$_POST['delete_post']);
@@ -129,14 +133,6 @@ if (isset($_POST['delete_bm'])) {
 }
 
 // -------返信-------
-
-// 返信文の返信ボタンが押された場合
-if (isset($_POST['reply_btn_reply'])) {
-    $_SESSION['reply_btn'] = (int)$_POST['reply_btn_reply'];
-    $_SESSION['reply_btn_reply_id'] = (int)$_POST['reply_btn_reply_id'];
-    header('Location: reply.php#reply');
-    exit;
-}
 
 // いいねが押された場合
 if (isset($_POST['insert_reply_like'])) {
@@ -213,6 +209,13 @@ if (isset($_POST['delete_reply_bm'])) {
                                 <button type="submit">登録</button>
                             </form>
                         </div>
+                        <?php if ($error['category_name'] === 'blank') : ?>
+                            <p>入力してください。</p>
+                        <?php endif; ?>
+
+                        <?php if ($error['category_name'] === 'over') : ?>
+                            <p>20字以内で入力してください。</p>
+                        <?php endif; ?>
                     </div>   
                 </div>
 
@@ -275,18 +278,9 @@ if (isset($_POST['delete_reply_bm'])) {
                             <ul class="timeline-btn-list">
                                 <!-- 返信ボタン -->
                                 <?php if (isset($bookmark['reply_id'])) : ?>
-                                    <!---post_idとreply_idをセッションに保存する -->
-                                    <form action="" method="post">
-                                        <input type="hidden" name="reply_btn_reply" value=<?= h($bookmark['post_id']) ?>>
-                                        <input type="hidden" name="reply_btn_reply_id" value=<?= h($bookmark['reply_id']) ?>>
-                                        <li><button type="submit">返信</button></li>
-                                    </form>
+                                    <li><button type="submit"><a href="reply.php?r_id=<?= h($bookmark['reply_id']) ?>#reply">返信</a></button></li>
                                 <?php else : ?>
-                                    <!-- post_idをセッションに保存する -->
-                                    <form action="" method="post">
-                                        <input type="hidden" name="reply_btn_post" value=<?= h($bookmark['post_id']) ?>>
-                                        <li><button type="submit">返信</button></li>
-                                    </form>
+                                    <li><button type="submit"><a href="reply.php?p_id=<?= h($bookmark['post_id']) ?>#reply">返信</a></button></li>
                                 <?php endif; ?>
 
                                 <!-- アカウントボタン -->
@@ -373,14 +367,16 @@ if (isset($_POST['delete_reply_bm'])) {
                     <div class="right-side-bar">
                         <!-- 投稿または返信をカテゴリーリストに追加 -->
                         <form action="" method="post" id="category">
-                            <p>リストに追加する</p>
-                            <select name="category_id">
-                                <option value=""></option>
-                                <?php foreach ($category_ids as $category_id) : ?>
-                                    <option value="<?= h($category_id['id']) ?>"><?= h($category_id['name']) ?></option>
-                                <?php endforeach ?>    
-                            </select>
+                            <label>リストに追加する</label>
                             <button type="submit">登録</button>
+                            <div>
+                                <select name="category_id" class="category-list">
+                                    <option value="">選択してください</option>
+                                    <?php foreach ($category_ids as $category_id) : ?>
+                                        <option value="<?= h($category_id['id']) ?>"><?= h($category_id['name']) ?></option>
+                                    <?php endforeach ?>    
+                                </select>
+                            </div>
                         </form>
                     </div>
                 </div>
