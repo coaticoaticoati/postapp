@@ -311,9 +311,9 @@ if (isset($_FILES['image'])) {
                                 <ul class="timeline-btn-list">
                                     <!-- 返信ボタン -->
                                     <?php if (isset($post['reply_id'])) : ?>
-                                        <li><button type="submit"><a href="reply.php?r_id=<?= h($post['reply_id']) ?>#reply">返信</a></button></li>
+                                        <li><button><a href="reply.php?r_id=<?= h($post['reply_id']) ?>#reply">返信</a></button></li>
                                     <?php else : ?>
-                                        <li><button type="submit"><a href="reply.php?p_id=<?= h($post['post_id']) ?>#reply">返信</a></button></li>
+                                        <li><button><a href="reply.php?p_id=<?= h($post['post_id']) ?>#reply">返信</a></button></li>
                                     <?php endif; ?>
 
                                     <!-- アカウントボタン -->

@@ -178,10 +178,10 @@ while ($block_row = $block_stmt->fetch()) {
                                     <div class="search-buttons">
                                         <ul class="search-btn-list">
                                             <!-- 返信ボタン -->
-                                            <li><button type="submit"><a href="reply.php?p_id=<?= h($search_post['post_id']) ?>#reply">返信</a></button></li>
+                                            <li><button><a href="reply.php?p_id=<?= h($search_post['post_id']) ?>#reply">返信</a></button></li>
 
                                             <!-- アカウントボタン -->
-                                            <li><button type="submit"><a href="user.php?id=<?= h($search_post['member_id']) ?>">アカウント</a></button></li>
+                                            <li><button><a href="user.php?id=<?= h($search_post['member_id']) ?>">アカウント</a></button></li>
                                             
                                             <!-- いいねボタン -->
                                             <!-- 投稿に対するいいねボタン -->

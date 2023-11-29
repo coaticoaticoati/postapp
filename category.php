@@ -263,16 +263,13 @@ if (isset($_POST['delete_reply_bm'])) {
                             <ul class="timeline-btn-list">
                                 <!-- 返信ボタン -->
                                 <?php if (isset($category['reply_id'])) : ?>
-                                    <li><button type="submit"><a href="reply.php?r_id=<?= h($category['reply_id']) ?>#reply">返信</a></button></li>
+                                    <li><button><a href="reply.php?r_id=<?= h($category['reply_id']) ?>#reply">返信</a></button></li>
                                 <?php else : ?>
-                                    <li><button type="submit"><a href="reply.php?p_id=<?= h($category['post_id']) ?>#reply">返信</a></button></li>
+                                    <li><button><a href="reply.php?p_id=<?= h($category['post_id']) ?>#reply">返信</a></button></li>
                                 <?php endif; ?>
 
                                 <!-- アカウントボタン -->
-                                <form action="" method="post">
-                                    <input type="hidden" name="user_page" value=<?= h($category['user_id']) ?>>
-                                    <li><button type="submit">アカウント</button></li>
-                                </form>
+                                <li><button><a href="user.php?id=<?= h($category['user_id']) ?>">アカウント</a></button></li>
 
                                 <!-- いいねボタン -->
                                 <!-- 返信に対するいいねボタン -->
