@@ -43,7 +43,7 @@ INNER JOIN posts ON bookmarks.post_id = posts.post_id
 WHERE bookmarks.user_id = :user_id
 GROUP BY bookmarks.post_id';
 $bm_post_stmt = $dbh->prepare($sql);
-$bm_post_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+$bm_post_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 $bm_post_stmt->execute();
 while ($bm_post_row = $bm_post_stmt->fetch()) { 
     $bookmarks[] = $bm_post_row;
@@ -54,7 +54,7 @@ INNER JOIN replies ON bookmarks.reply_id = replies.reply_id
 WHERE bookmarks.user_id = :user_id
 GROUP BY bookmarks.reply_id';
 $bm_rep_stmt = $dbh->prepare($sql);
-$bm_rep_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+$bm_rep_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 $bm_rep_stmt->execute();
 while ($bm_rep_row = $bm_rep_stmt->fetch()) { 
     $bookmarks[] = $bm_rep_row;
@@ -80,7 +80,7 @@ if (isset($_POST['ids']) && is_array($_POST['ids'])) {
             VALUES (:reply_id, :user_id, :category_id)';
             $ins_rep_stmt = $dbh->prepare($sql);
             $ins_rep_stmt->bindValue(':reply_id', $post_rep_id['reply_id'], PDO::PARAM_INT);
-            $ins_rep_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+            $ins_rep_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
             $ins_rep_stmt->bindValue(':category_id', $_POST['category_id'], PDO::PARAM_INT);
             $ins_rep_stmt->execute();
         } else {
@@ -88,7 +88,7 @@ if (isset($_POST['ids']) && is_array($_POST['ids'])) {
             VALUES (:post_id, :user_id, :category_id)';
             $ins_post_stmt = $dbh->prepare($sql);
             $ins_post_stmt->bindValue(':post_id', $post_rep_id['post_id'], PDO::PARAM_INT);
-            $ins_post_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+            $ins_post_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
             $ins_post_stmt->bindValue(':category_id', $_POST['category_id'], PDO::PARAM_INT);
             $ins_post_stmt->execute();
         }
@@ -183,7 +183,7 @@ if (isset($_POST['delete_reply_bm'])) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['user_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -278,13 +278,13 @@ if (isset($_POST['delete_reply_bm'])) {
                             <ul class="timeline-btn-list">
                                 <!-- 返信ボタン -->
                                 <?php if (isset($bookmark['reply_id'])) : ?>
-                                    <li><button type="submit"><a href="reply.php?r_id=<?= h($bookmark['reply_id']) ?>#reply">返信</a></button></li>
+                                    <li><button><a href="reply.php?r_id=<?= h($bookmark['reply_id']) ?>#reply">返信</a></button></li>
                                 <?php else : ?>
-                                    <li><button type="submit"><a href="reply.php?p_id=<?= h($bookmark['post_id']) ?>#reply">返信</a></button></li>
+                                    <li><button><a href="reply.php?p_id=<?= h($bookmark['post_id']) ?>#reply">返信</a></button></li>
                                 <?php endif; ?>
 
                                 <!-- アカウントボタン -->
-                                <li><button type="submit"><a href="user.php?id=<?= h($bookmark['user_id']) ?>">アカウント</a></button></li>
+                                <li><button><a href="user.php?id=<?= h($bookmark['user_id']) ?>">アカウント</a></button></li>
 
                                 <!-- いいねボタン -->
                                 <!-- 返信に対するいいねボタン -->
@@ -342,7 +342,7 @@ if (isset($_POST['delete_reply_bm'])) {
 
                                 <!-- 削除ボタン-->
                                 <!-- ログインユーザーの投稿or返信のみ表示する -->            
-                                <?php if($bookmark['user_id'] === $_SESSION['login']['member_id']) : ?>
+                                <?php if($bookmark['user_id'] === $_SESSION['user_id']) : ?>
                                     <!-- 返信に対する削除ボタン -->
                                     <?php if (isset($post['reply_id'])) : ?>
                                         <form action="" method="post">

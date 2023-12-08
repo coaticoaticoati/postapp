@@ -12,7 +12,7 @@ INNER JOIN members ON blocks.is_blocked = members.member_id
 LEFT JOIN icons ON blocks.is_blocked = icons.user_id
 WHERE block = :block';
 $block_stmt = $dbh->prepare($sql);
-$block_stmt->bindValue(':block', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+$block_stmt->bindValue(':block', $_SESSION['user_id'], PDO::PARAM_INT);
 $block_stmt->execute();
 while ($blocked_user = $block_stmt->fetch()) {
     $blocked_users[] = $blocked_user;
@@ -34,7 +34,7 @@ while ($blocked_user = $block_stmt->fetch()) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['user_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>

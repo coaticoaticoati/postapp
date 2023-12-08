@@ -15,7 +15,7 @@ $user_id = (int)$_GET['id'];
 if (isset($_POST['unblock_user'])) {
     $sql = 'DELETE FROM blocks WHERE block = :block AND is_blocked = :is_blocked';
     $block_del_stmt = $dbh->prepare($sql);
-    $block_del_stmt->bindValue(':block', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $block_del_stmt->bindValue(':block', $_SESSION['user_id'], PDO::PARAM_INT);
     $block_del_stmt->bindValue(':is_blocked', $user_id, PDO::PARAM_INT);
     $block_del_stmt->execute();
     header('Location: block_account.php');
@@ -36,7 +36,7 @@ if (isset($_POST['unblock_user'])) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['user_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>

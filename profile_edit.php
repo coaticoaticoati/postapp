@@ -13,7 +13,7 @@ if (isset($_POST['update_name'])) {
     $sql = 'UPDATE members SET name = :name WHERE member_id = :member_id';
     $post_stmt = $dbh->prepare($sql);
     $post_stmt->bindValue(':name', $_POST['update_name'], PDO::PARAM_STR);
-    $post_stmt->bindValue(':member_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $post_stmt->bindValue(':member_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $post_stmt->execute();
     $_SESSION['login']['name'] = $_POST['update_name'];
 }
@@ -65,7 +65,7 @@ if (isset($_FILES['image'])) {
 
 // アイコンを削除
 if (isset($_POST['delete_icon'])) {
-    delete_icon($_SESSION['login']['member_id']);
+    delete_icon($_SESSION['user_id']);
     header('Location: profile_edit.php');
     exit;
 }  
@@ -85,14 +85,14 @@ if (isset($_POST['insert_profile'])) {
         profile_content = VALUES (profile_content)';
         $pro_ins_stmt = $dbh->prepare($sql);
         $pro_ins_stmt->bindValue(':profile_content', $_POST['insert_profile'], PDO::PARAM_STR);
-        $pro_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+        $pro_ins_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
         $pro_ins_stmt->execute();
     }
 }
 
 // プロフィール文を削除
 if (isset($_POST['delete_profile'])) {
-    delete_profile($_SESSION['login']['member_id']);
+    delete_profile($_SESSION['user_id']);
     header('Location: profile_edit.php');
     exit;   
 }
@@ -111,7 +111,7 @@ if (isset($_POST['delete_profile'])) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['user_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -132,7 +132,7 @@ if (isset($_POST['delete_profile'])) {
                     <!-- アイコンを編集 -->
                     <div class="edit-icon">
                         <h3>アイコンを編集</h3>
-                        <P><img src="<?= h(get_icon($_SESSION['login']['member_id'])) ?>"></P>
+                        <P><img src="<?= h(get_icon($_SESSION['user_id'])) ?>"></P>
                         <form action="" method="post" enctype="multipart/form-data">    
                             <input type="hidden" name="MAX_FILE_SIZE" value="1048576"><!-----ファイルの最大サイズを指定----->
                             <input type="file" name="image" accept="image/*">
@@ -168,7 +168,7 @@ if (isset($_POST['delete_profile'])) {
                         <h3>プロフィール文を編集</h3>
                         <div class="profile-form">
                             <form action="" method="post">    
-                                <textarea name="insert_profile" class="profile-box"><?= h(get_profile($_SESSION['login']['member_id'])) ?></textarea>
+                                <textarea name="insert_profile" class="profile-box"><?= h(get_profile($_SESSION['user_id'])) ?></textarea>
                                 <div><button type="submit">送信</button></div>
                             </form>
                         </div>

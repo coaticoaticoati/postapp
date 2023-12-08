@@ -24,41 +24,39 @@ if ($_POST['regi_pass'] === '') {
     $error['regi_pass'] = 'blank';
 }
 
-// ------新規登録関連--------
-
+// 新規登録
 // メールアドレスのバリデーション
 if (isset($_POST['regi_email'])) {
     $dbh = db_open();
     $sql = 'SELECT * FROM members WHERE members.email = :email';
-    $reg_stmt = $dbh->prepare($sql);
-    $reg_stmt->bindValue(':email', $_POST['regi_email'], PDO::PARAM_STR);
-    $reg_stmt->execute();
-    $reg_row = $reg_stmt->fetch();
+    $regi_stmt = $dbh->prepare($sql);
+    $regi_stmt->bindValue(':email', $_POST['regi_email'], PDO::PARAM_STR);
+    $regi_stmt->execute();
+    $regi_row = $regi_stmt->fetch();
     // メールアドレスに重複がないかチェック、登録済みであればメッセージ表示
-    if ($reg_row !== false) { // 登録済みでない場合は、$reg_rowがの中身が(bool)falseとなるから、isset()やempty()は使えない
+    if ($regi_row !== false) {
         $error['email_value'] = 'registered'; // 変数を作成し、適当な値registeredを代入
     }
 }
 
-// passwordのバリデーション
+// パスワードのバリデーション
 if(isset($_POST['regi_pass'])) {  
-    if (!empty(preg_match('/^(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z])[A-Z0-9a-z]{8,100}$/', $_POST['regi_pass']))) {
-        $_SESSION['register'] = $_POST; // フォームの内容をセッションで保存  
-    } else { // マッチしない場合
+    // マッチしない場合
+    if (empty(preg_match('/^(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z])[A-Z0-9a-z]{8,100}$/', $_POST['regi_pass']))) {
         $error['pass_value'] = 'not_match'; 
     }
 }
 // 全てOKなら確認ページへ
 if (isset($_POST['user_name'], $_POST['regi_email'], $_POST['regi_pass'])) { 
-    // 上がないとフォーム入力前のトップページも当てはまるので、account_entry.phpを表示できずconfirm.phpに移動してまう
+    // 上記がないとフォーム入力前のトップページも当てはまるので、account_entry.phpを表示できずconfirm.phpに移動してしまう
     if (empty($reg_row) && empty($error)) {
-        header('Location: confirm.php'); // 確認ページへ
+        $_SESSION['register'] = $_POST;
+        header('Location: confirm.php');
         exit;
     }      
 }
 
-// -------ログイン関連--------
-
+// ログイン
 // データベースからユーザー情報を取得
 
 // 入力されたメールアドレスが存在するか(メールアドレスで検索し、登録があればnameとe-mailとpassが$login_rowに代入される)
@@ -68,22 +66,21 @@ if (isset($_POST['login_email'])) {
     $login_stmt = $dbh->prepare($sql);
     $login_stmt->bindValue(':email', $_POST['login_email'], PDO::PARAM_STR);
     $login_stmt->execute();
-    $login_row = $login_stmt->fetch(); // $login_rowの中身は連想配列
+    $login_row = $login_stmt->fetch();
 
     // データベース内に登録がない場合
-    if ($login_row === false) { // 登録済みでない場合は、$login_rowがの中身がfalseとなる
+    if ($login_row === false) {
         $error['login'] = 'not_login';
     }
-    // passwordの照合をし、合っていたら、ユーザー情報（$login_row）をセッションに保存し、トップページへ
+    // passwordの照合をし、合っていたら、ユーザーIDをセッションに保存し、トップページへ
     if (password_verify($_POST['login_pass'], $login_row['password'])) {
-        $_SESSION['login'] = $login_row; // キーは$_SESSION['login'][user_name]、$_SESSION['login'][user_email]、$_SESSION['login'][user_pass]…
-        header('Location: index.php'); // トップページへ
+        $_SESSION['user_id'] = $login_row['member_id'];
+        header('Location: index.php');
     // passwordが合致していない場合
     } else { 
         $error['login'] = 'not_login';
     } 
 }
-// $_SESSION['login']はDB(menbers)上の値全て、$_SESSION['register']は登録フォームの内容
 ?>
 <!DOCTYPE html>
 <html lang="ja">

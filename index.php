@@ -26,15 +26,15 @@ SELECT post_id, created_at, content, user_id, file_path FROM posts WHERE user_id
 // カラムuser_idがログインユーザーである、post_id等を抽出し、
 // 2つの抽出結果を統合
 $post_stmt = $dbh->prepare($sql);
-$post_stmt->bindValue(':follow', $_SESSION['login']['member_id'], PDO::PARAM_INT);
-$post_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);  
+$post_stmt->bindValue(':follow', $_SESSION['user_id'], PDO::PARAM_INT);
+$post_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);  
 $post_stmt->execute();
 while ($post_row = $post_stmt->fetch()) { 
     $posts[] = $post_row;
 }
 
 // データベースからログインユーザーの返信を取得
-$reply_stmt = get_user_reply($_SESSION['login']['member_id']); 
+$reply_stmt = get_user_reply($_SESSION['user_id']); 
 while ($reply_row = $reply_stmt->fetch()) { 
     $posts[] = $reply_row;
 }
@@ -211,7 +211,7 @@ if (isset($_FILES['image'])) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['user_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -220,7 +220,7 @@ if (isset($_FILES['image'])) {
         <main>
             <div class="post-form">
                 <div class="container">
-                    <h3>こんにちは、<?= h($_SESSION['login']['name']) ?>さん</h3>
+                    <h3>こんにちは、<?= h(get_user_name($_SESSION['user_id'])) ?>さん</h3>
                     <form action="" method="post" enctype="multipart/form-data">
                         <textarea name="content" class="textarea-post"></textarea>    
                         <input type="hidden" name="MAX_FILE_SIZE" value="1048576"><!---ファイルの最大サイズを指定--->
@@ -375,7 +375,7 @@ if (isset($_FILES['image'])) {
 
                                     <!-- 削除ボタン-->
                                     <!-- ログインユーザーの投稿or返信のみ表示する -->            
-                                    <?php if($post['user_id'] === $_SESSION['login']['member_id']) : ?>
+                                    <?php if($post['user_id'] === $_SESSION['user_id']) : ?>
                                         <!-- 返信に対する削除ボタン -->
                                         <?php if (isset($post['reply_id'])) : ?>
                                             <form action="" method="post">

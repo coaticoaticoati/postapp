@@ -18,7 +18,7 @@ $members_stmt = $dbh->query($sql);
 $dbh = db_open();
 $sql = 'SELECT * FROM follows WHERE follow = :follow';
 $follows_stmt = $dbh->prepare($sql);
-$follows_stmt->bindValue(':follow', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+$follows_stmt->bindValue(':follow', $_SESSION['user_id'], PDO::PARAM_INT);
 $follows_stmt->execute();
 while ($follows_row = $follows_stmt->fetch()) {
     $follows[] = $follows_row;  
@@ -61,7 +61,7 @@ while ($block_row = $block_stmt->fetch()) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['user_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -73,7 +73,7 @@ while ($block_row = $block_stmt->fetch()) {
                     <!-- ユーザー一覧を表示し、フォローしているかどうかでボタンの表示を変える-->
                     <?php while ($member_row = $members_stmt->fetch()) : ?>
                         <?php // $member_rowのうち、ログインユーザーであるものはスキップする
-                        if ($member_row['member_id'] === $_SESSION['login']['member_id']) { 
+                        if ($member_row['member_id'] === $_SESSION['user_id']) { 
                             continue;
                         } ?>
                         <!-- アイコン -->

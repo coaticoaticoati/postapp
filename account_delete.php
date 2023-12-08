@@ -24,7 +24,7 @@ if(isset($_POST['user_delete'])) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['user_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -35,7 +35,7 @@ if(isset($_POST['user_delete'])) {
                 <div class="container">
                     <h3>アカウントを削除しますか？</h3>
                     <form action="" method="post">
-                        <input type="hidden" name="user_delete" value=<?= h($_SESSION['login']['member_id']) ?>> 
+                        <input type="hidden" name="user_delete" value=<?= h($_SESSION['user_id']) ?>> 
                         <button type="submit">削除する</button>
                         <button><a href="profile_edit.php">戻る</a></button>
                     </form>

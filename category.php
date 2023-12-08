@@ -178,7 +178,7 @@ if (isset($_POST['delete_reply_bm'])) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['user_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -327,7 +327,7 @@ if (isset($_POST['delete_reply_bm'])) {
 
                                 <!-- 削除ボタン-->
                                 <!-- ログインユーザーの投稿or返信のみ表示する -->            
-                                <?php if($category['user_id'] === $_SESSION['login']['member_id']) : ?>
+                                <?php if($category['user_id'] === $_SESSION['user_id']) : ?>
                                     <!-- 返信に対する削除ボタン -->
                                     <?php if (isset($post['reply_id'])) : ?>
                                         <form action="" method="post">

@@ -132,7 +132,7 @@ if (isset($_POST['insert_follow'])) {
 }
 
 // ログインユーザーのフォロー一覧を取得
-$following_user_list = get_follow($_SESSION['login']['member_id']);
+$following_user_list = get_follow($_SESSION['user_id']);
 
 // -------ブロック---------
 
@@ -170,7 +170,7 @@ if (isset($_POST['block_user'])) {
     $sql = 'INSERT INTO blocks (block, is_blocked) 
     VALUES (:block, :is_blocked)';
     $block_ins_stmt = $dbh->prepare($sql);
-    $block_ins_stmt->bindValue(':block', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $block_ins_stmt->bindValue(':block', $_SESSION['user_id'], PDO::PARAM_INT);
     $block_ins_stmt->bindValue(':is_blocked', $user_id, PDO::PARAM_INT);
     $block_ins_stmt->execute();
 
@@ -186,11 +186,11 @@ if (isset($_POST['block_user'])) {
 
     //
     foreach ($other_user_follows as $other_user_follow) {
-        if ($other_user_follow['is_followed'] === $_SESSION['login']['member_id']) {
+        if ($other_user_follow['is_followed'] === $_SESSION['user_id']) {
             $sql = 'DELETE FROM follows WHERE follow = :follow AND is_followed = :is_followed'; // followかつis_followedであるものを削除する
             $follow_del_stmt = $dbh->prepare($sql);
             $follow_del_stmt->bindValue(':follow', $user_id, PDO::PARAM_INT );
-            $follow_del_stmt->bindValue(':is_followed', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+            $follow_del_stmt->bindValue(':is_followed', $_SESSION['user_id'], PDO::PARAM_INT);
             $follow_del_stmt->execute();
             break;
         }   
@@ -214,7 +214,7 @@ if (isset($_POST['block_user'])) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['user_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -233,7 +233,7 @@ if (isset($_POST['block_user'])) {
 
                         <p><?= h($profile_row) ?></p>
 
-                        <?php if ($user_id === $_SESSION['login']['member_id']) : ?>
+                        <?php if ($user_id === $_SESSION['user_id']) : ?>
                             <button><a href="profile_edit.php">プロフィールを編集</a></button>
                         <?php else : ?>
                             <div class="follow-block">

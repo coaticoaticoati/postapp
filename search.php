@@ -81,7 +81,7 @@ $sql = 'SELECT post_is_liked_id FROM likes
 INNER JOIN posts ON likes.post_is_liked_id = posts.post_id 
 WHERE likes.user_id = :user_id';
 $posts_like_stmt = $dbh->prepare($sql);
-$posts_like_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+$posts_like_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 $posts_like_stmt->execute();
 while ($post_like_row = $posts_like_stmt->fetch()) { 
     $post_likes[] = $post_like_row;
@@ -110,7 +110,7 @@ while ($block_row = $block_stmt->fetch()) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['user_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -218,7 +218,7 @@ while ($block_row = $block_stmt->fetch()) {
                             
                                             <!-- 削除ボタン -->
                                             <!-- ログインユーザーの投稿のみ表示する -->            
-                                            <?php if($search_post['member_id'] === $_SESSION['login']['member_id']) : ?>
+                                            <?php if($search_post['member_id'] === $_SESSION['user_id']) : ?>
                                                 <!-- 投稿に対する削除ボタン -->  
                                                 <form action="" method="post">
                                                     <input type="hidden" name="delete_post" value=<?= h($search_post['post_id']) ?>>

@@ -124,7 +124,7 @@ function build_reply_tree($all_replies, $parent_id = null) {
 $sql = 'SELECT post_is_liked_id FROM likes INNER JOIN posts ON likes.post_is_liked_id = posts.post_id
 WHERE likes.user_id = :user_id';
 $post_like_stmt = $dbh->prepare($sql);
-$post_like_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+$post_like_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 $post_like_stmt->execute();
 while ($post_like_row = $post_like_stmt->fetch()) { 
     $post_likes[] = $post_like_row;
@@ -134,7 +134,7 @@ while ($post_like_row = $post_like_stmt->fetch()) {
 $sql = 'SELECT reply_is_liked_id FROM reply_likes INNER JOIN replies ON reply_likes.reply_is_liked_id = replies.reply_id
 WHERE reply_likes.user_id = :user_id';
 $reply_like_stmt = $dbh->prepare($sql);
-$reply_like_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+$reply_like_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 $reply_like_stmt->execute();
 while ($reply_like_row = $reply_like_stmt->fetch()) { 
     $reply_likes[] = $reply_like_row;
@@ -212,7 +212,7 @@ while ($block_row = $block_stmt->fetch()) {
                 <ul>
                     <li class="navbar-item"><a href="logout.php">ログアウト</a></li>
                     <li><a href="bookmark.php">ブックマーク</a></li>
-                    <li><a href="user.php?id=<?= h($_SESSION['login']['member_id']) ?>">プロフィール</a></li>
+                    <li><a href="user.php?id=<?= h($_SESSION['user_id']) ?>">プロフィール</a></li>
                     <li><a href="users_list.php">ユーザー一覧</a></li>
                     <li><a href="search.php">検索</a></li>
                 </ul>
@@ -310,7 +310,7 @@ while ($block_row = $block_stmt->fetch()) {
                                         </form>
                                         
                                         <!-- 削除ボタン -->
-                                        <?php if($post_row['user_id'] === $_SESSION['login']['member_id']) : ?>
+                                        <?php if($post_row['user_id'] === $_SESSION['user_id']) : ?>
                                             <form action="" method="post">
                                                 <input type="hidden" name="delete_post" value=<?= h($post_row['post_id']) ?>>
                                                 <li><button type="submit">削除</button></li>
@@ -430,7 +430,7 @@ while ($block_row = $block_stmt->fetch()) {
                                                 </form>
 
                                                 <!-- 削除ボタン -->
-                                                <?php if($reply['user_id'] === $_SESSION['login']['member_id']) : ?>
+                                                <?php if($reply['user_id'] === $_SESSION['user_id']) : ?>
                                                     <form action="" method="post">
                                                         <input type="hidden" name="delete_reply" value=<?= h($reply['reply_id']) ?>>
                                                         <li><button type="submit" class="user-button">削除</button></li>
