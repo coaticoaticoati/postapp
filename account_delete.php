@@ -4,7 +4,7 @@ require_once('functions.php');
 session_start();
 if(isset($_POST['user_delete'])) {
     delete_user($_POST['user_delete']);
-    $_SESSION = array(); // 初期化
+    $_SESSION = array();
     session_destroy();
     header('Location: goodbye.php');
     exit;

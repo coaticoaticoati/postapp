@@ -1,5 +1,5 @@
 <?php
-// ini_set("display_errors", "OFF");
+ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 

@@ -12,19 +12,18 @@ if (empty($_SESSION)) {
 // データベース接続
 $dbh = db_open();
 
+// リダイレクト先を変数に代入
 $redirect_back = 'Location: index.php';
 
 // -------投稿-------
 
 // データベースからログインユーザーとフォローユーザーの投稿を取得
+// ログインユーザーがフォローしているユーザーの投稿と、ログインユーザーの投稿を取得し、結合する
 $sql = 'SELECT post_id, posts.created_at, content, user_id, file_path
 FROM posts INNER JOIN follows ON posts.user_id = follows.is_followed
 WHERE follow = :follow
 UNION ALL
 SELECT post_id, created_at, content, user_id, file_path FROM posts WHERE user_id = :user_id'; 
-// INNER JOINでpostsとfollowsを内部結合して、followカラムがログインユーザーである、post_id等を抽出し、
-// カラムuser_idがログインユーザーである、post_id等を抽出し、
-// 2つの抽出結果を統合
 $post_stmt = $dbh->prepare($sql);
 $post_stmt->bindValue(':follow', $_SESSION['user_id'], PDO::PARAM_INT);
 $post_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);  
@@ -48,7 +47,7 @@ if (isset($posts)) {
     // 配列の要素全てに対して、strtotime関数を適用させ、戻り値を元に新たな配列を生成
     $created_at_array = array_map('strtotime', $created_at_array);
 
-    // $posts_repliesを並び変える
+    // $postsを並び変える
     array_multisort($created_at_array, SORT_DESC, $user_id_array, SORT_ASC, $posts);
 }
 
@@ -178,7 +177,7 @@ if (isset($_FILES['image'])) {
                     if (move_uploaded_file($file_tmp_path, $save_path)) { 
                         // データベースに保存（ ファイル名、ファイルパス、投稿文 ）
                         insert_file($_POST['content'], $file_name, $save_path);
-                        header('Location: ./'); // 自動リダイレクト
+                        header('Location: index.php');
                         exit;
                     } else {
                         $error['file_save'] = 'not_save';
@@ -190,7 +189,7 @@ if (isset($_FILES['image'])) {
         } else {
             // 投稿文のみの登録
             insert_post($_POST['content']);
-                header('Location: ./'); //自動リダイレクト
+                header('Location: index.php');
                 exit;
         }
     }   

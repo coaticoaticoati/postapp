@@ -9,6 +9,7 @@ if (empty($_SESSION)) {
     exit;  
 }
 
+// リダイレクト先を変数に代入
 $redirect_back = 'Location: category.php';
 
 // データベース接続

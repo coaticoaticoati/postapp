@@ -15,6 +15,7 @@ $dbh = db_open();
 // user_idを代入
 $user_id = (int)$_GET['id'];
 
+// リダイレクト先を変数に代入
 $redirect_url = 'user.php?id='.$user_id;
 
 // -----プロフィール------

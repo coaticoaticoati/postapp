@@ -1,6 +1,6 @@
 <?php
 session_start();
-$_SESSION = array(); // 初期化
+$_SESSION = array();
 session_destroy();
 ?>
 <!DOCTYPE html>

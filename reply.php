@@ -26,6 +26,7 @@ if (empty($post_id)) {
     $post_id = $post_id['post_id'];
 }
 
+// リダイレクト先を変数に代入
 $redirect_back = 'Location: reply.php';
 
 // ------- 投稿 -------

@@ -59,7 +59,7 @@ if (isset($_POST['user_name'], $_POST['regi_email'], $_POST['regi_pass'])) {
 // ログイン
 // データベースからユーザー情報を取得
 
-// 入力されたメールアドレスが存在するか(メールアドレスで検索し、登録があればnameとe-mailとpassが$login_rowに代入される)
+// 入力されたメールアドレスが存在するか確認
 if (isset($_POST['login_email'])) {
     $dbh = db_open();
     $sql = 'SELECT * FROM members WHERE members.email = :email';
@@ -72,11 +72,11 @@ if (isset($_POST['login_email'])) {
     if ($login_row === false) {
         $error['login'] = 'not_login';
     }
-    // passwordの照合をし、合っていたら、ユーザーIDをセッションに保存し、トップページへ
+    // パスワードを照合し、マッチしたら、ユーザーIDをセッションに保存し、トップページへ
     if (password_verify($_POST['login_pass'], $login_row['password'])) {
         $_SESSION['user_id'] = $login_row['member_id'];
         header('Location: index.php');
-    // passwordが合致していない場合
+    // パスワードがマッチしない場合
     } else { 
         $error['login'] = 'not_login';
     } 
