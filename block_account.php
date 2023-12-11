@@ -17,8 +17,6 @@ $block_stmt->execute();
 while ($blocked_user = $block_stmt->fetch()) {
     $blocked_users[] = $blocked_user;
 }
-
-
 ?>
 <!DOCTYPE html>
 <html lang="ja">

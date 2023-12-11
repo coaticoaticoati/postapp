@@ -1,5 +1,5 @@
 <?php
-// ini_set("display_errors", "OFF");
+ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 
@@ -9,11 +9,11 @@ $dbh = db_open();
 // -------検索------
 
 if (isset($_POST['search'])) {
-    //検索フォームの内容を取得
+    // 検索フォームの内容を取得
     $search = $_POST['search'];
-    //空白を半角スペースに置換
+    // 全角スペースを半角スペースに置換
     $convert_space = mb_convert_kana($search, 's');
-    //検索ワードを配列に格納
+    // 検索ワードを配列に格納
     $explode_words = explode(" ", $convert_space);
     // 検索ワードの数だけ$search_wordsを作り、検索ワードひとつずつを$search_arrayに格納
     foreach ($explode_words as $explode_word) {
@@ -22,6 +22,7 @@ if (isset($_POST['search'])) {
         $search_array[] = '%'.$explode_word.'%';
         $search_array[] = '%'.$explode_word.'%';
     }
+    
 
     // 投稿内容とユーザー名を検索
     $sql = 'SELECT post_id, content, posts.created_at, members.member_id, file_path, name FROM members 

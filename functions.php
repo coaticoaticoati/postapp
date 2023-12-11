@@ -15,10 +15,10 @@ function db_open() :PDO {
             PDO::ATTR_EMULATE_PREPARES => false,
             PDO::MYSQL_ATTR_MULTI_STATEMENTS => false
         ];
-        $dbh = new PDO("mysql:host=xxxx;dbname=xxxx", $user, $password, $opt); 
+        $dbh = new PDO("mysql:host=xxxx;xxxx", $user, $password, $opt); 
         return $dbh;
     } catch (PDOException $e) {
-        echo "データベース接続エラー:{$e->getMessage()}";
+        echo "データベース接続エラー:{$e->getMessage()}"; // 本番環境では消す
     }
 }
 

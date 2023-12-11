@@ -6,11 +6,10 @@ session_start();
 // データベース接続
 $dbh = db_open(); 
 
-// リダイレクト先を変数に代入
 $user_id = (int)$_GET['id'];
 
 // ブロック解除が押された場合
-// データベース削除
+// blockテーブルから削除
 if (isset($_POST['unblock_user'])) {
     $sql = 'DELETE FROM blocks WHERE block = :block AND is_blocked = :is_blocked';
     $block_del_stmt = $dbh->prepare($sql);

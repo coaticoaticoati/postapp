@@ -1,5 +1,5 @@
 <?php
-//ini_set("display_errors", "OFF");
+ini_set("display_errors", "OFF");
 require_once('functions.php');
 session_start();
 
@@ -44,14 +44,14 @@ if (isset($_FILES['image'])) {
     $file_extentions = ['jpg', 'jpeg', 'png']; //許容する拡張子
     $file_ext = pathinfo($file_name, PATHINFO_EXTENSION); //ファイル名の拡張子のみ抽出
     $file_ext = strtolower($file_ext); //大文字だった場合小文字に変える
-    // 拡張子配列のいずれかと合致しなかった場合
+    // 拡張子配列のいずれとも合致しなかった場合
     if (!in_array($file_ext, $file_extentions)) {
         $error['file_ext'] = 'not_match';
     }
     // ファイルがアップロードされているか
     if(!isset($error)) {
         if (is_uploaded_file($file_tmp_path)) { // ファイルがアップロードされているか
-            if (move_uploaded_file($file_tmp_path, $save_path)) { //一時ディレクトリ($file_tmp_path)からimages($save_pathの場所)に移動
+            if (move_uploaded_file($file_tmp_path, $save_path)) { //一時ディレクトリ($file_tmp_path)からimages($save_path)に移動
                 //DBに保存（ファイル名、ファイルパス、投稿文）
                 insert_icon($file_name, $save_path);
             } else {

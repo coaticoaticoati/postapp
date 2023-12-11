@@ -154,34 +154,37 @@ if (isset($_FILES['image'])) {
             $file_name = basename($file['name']); // パス名からディレクトリ部分を除いたファイル名を取得
             $save_file_name = date('YmdHis').$file_name; // 保存ファイル名は日時+ファイル名とする
             
-            $upload_dir = 'images/'; // 保存先のファイルパスでこの下に保存する指定
-            $save_path = $upload_dir.$save_file_name; // 保存先のパス(+日付)
+            $save_path = 'images/'.$save_file_name; // 保存先のパス
 
-            // ファイルのバリデーション
+            // 画像ファイルのバリデーション
             // ファイルサイズは1MB未満か
-            if ($file_size > 1048576 || $file_error === 2 ) {
+            if ($file_size > 1048576 || $file_error === 2) {
                 $error['file_size'] = 'over';
             }
-            // 拡張は画像形式か
+
+            // 拡張子は画像形式か
             $file_extentions = ['jpg', 'jpeg', 'png']; // 許容する拡張子
             $file_ext = pathinfo($file_name, PATHINFO_EXTENSION); // ファイル名の拡張子のみ抽出
             $file_ext = strtolower($file_ext); // 大文字だった場合小文字に変える
-            // 拡張子配列のいずれかと合致しなかった場合
+            // 拡張子配列のいずれとも合致しなかった場合
             if (!in_array($file_ext, $file_extentions)) {
                 $error['file_ext'] = 'not_match';
             }
+
             // ファイルがアップロードされているか
             if(!isset($error)) {
                 if (is_uploaded_file($file_tmp_path)) {
-                    // 一時ディレクトリ($file_tmp_path)からimages($save_pathの場所)に移動
+                    // 一時ディレクトリ($file_tmp_path)からimagesディレクトリ($save_path)に移動
                     if (move_uploaded_file($file_tmp_path, $save_path)) { 
-                        // データベースに保存（ ファイル名、ファイルパス、投稿文 ）
+                        // データベースにも保存する（投稿文、ファイル名、ファイルパス）
                         insert_file($_POST['content'], $file_name, $save_path);
                         header('Location: index.php');
                         exit;
+                    // 画像を保存できなかった場合    
                     } else {
                         $error['file_save'] = 'not_save';
                     } 
+                // 画像をアップロードできなかった場合   
                 } else {
                     $error['file_upload'] = 'not_upload';
                 }
@@ -189,8 +192,8 @@ if (isset($_FILES['image'])) {
         } else {
             // 投稿文のみの登録
             insert_post($_POST['content']);
-                header('Location: index.php');
-                exit;
+            header('Location: index.php');
+            exit;
         }
     }   
 }

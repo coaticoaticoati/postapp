@@ -9,13 +9,14 @@ if (empty($_SESSION)) {
     exit;  
 }
 
-// ユーザーの一覧を取得
+// データベース接続
 $dbh = db_open();
+
+// ユーザーの一覧を取得
 $sql = 'SELECT * FROM members';
 $members_stmt = $dbh->query($sql);   
 
 // ログインユーザーのfollowテーブルの情報を取得
-$dbh = db_open();
 $sql = 'SELECT * FROM follows WHERE follow = :follow';
 $follows_stmt = $dbh->prepare($sql);
 $follows_stmt->bindValue(':follow', $_SESSION['user_id'], PDO::PARAM_INT);
