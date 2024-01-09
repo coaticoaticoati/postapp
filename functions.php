@@ -15,7 +15,7 @@ function db_open() :PDO {
             PDO::ATTR_EMULATE_PREPARES => false,
             PDO::MYSQL_ATTR_MULTI_STATEMENTS => false
         ];
-        $dbh = new PDO("mysql:host=xxxx;xxxx", $user, $password, $opt); 
+        $dbh = new PDO("mysql:host=xxxx;dbname=xxxx", $user, $password, $opt); 
         return $dbh;
     } catch (PDOException $e) {
         echo "データベース接続エラー:{$e->getMessage()}"; // 本番環境では消す
@@ -31,7 +31,7 @@ function insert_post($content) {
     VALUES (:user_id, :content, NULL, NULL)';
     $post_ins_stmt = $dbh->prepare($sql);
     $post_ins_stmt->bindValue(':content', $content);
-    $post_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id']);
+    $post_ins_stmt->bindValue(':user_id', $_SESSION['user_id']);
     $post_ins_stmt->execute();
 }
 
@@ -43,7 +43,7 @@ function insert_file($content, $file_name, $save_path) {
     VALUES (:content, :user_id, :file_name, :file_path)';
     $post_img_ins_stmt = $dbh->prepare($sql);
     $post_img_ins_stmt->bindValue(':content', $content, PDO::PARAM_STR);
-    $post_img_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $post_img_ins_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $post_img_ins_stmt->bindValue(':file_name', $file_name, PDO::PARAM_STR);
     $post_img_ins_stmt->bindValue(':file_path', $save_path, PDO::PARAM_STR);
     $post_img_ins_stmt->execute();
@@ -90,7 +90,7 @@ function insert_reply($post_id, $content) {
     $rep_ins_stmt = $dbh->prepare($sql);
     $rep_ins_stmt->bindValue(':post_id', $post_id, PDO::PARAM_INT);
     $rep_ins_stmt->bindValue(':content', $content, PDO::PARAM_STR);
-    $rep_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $rep_ins_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $rep_ins_stmt->execute();
 }
 
@@ -103,7 +103,7 @@ function insert_reply_reply($post_id, $content, $reply_reply_id) {
     $rep_rep_ins_stmt->bindValue(':post_id', $post_id, PDO::PARAM_INT);
     $rep_rep_ins_stmt->bindValue(':content', $content, PDO::PARAM_STR);
     $rep_rep_ins_stmt->bindValue(':reply_reply_id', $reply_reply_id, PDO::PARAM_INT);
-    $rep_rep_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $rep_rep_ins_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $rep_rep_ins_stmt->execute();
 }
 
@@ -147,7 +147,7 @@ function insert_like($insert_like) {
     VALUES (NULL, :post_is_liked_id, :user_id)'; // 重複不可
     $like_ins_stmt = $dbh->prepare($sql);
     $like_ins_stmt->bindValue(':post_is_liked_id', $insert_like, PDO::PARAM_INT);
-    $like_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $like_ins_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $like_ins_stmt->execute();
 }
 
@@ -157,7 +157,7 @@ function delete_like($delete_like) {
     $sql = 'DELETE FROM likes WHERE post_is_liked_id = :post_is_liked_id AND user_id = :user_id';
     $like_del_stmt = $dbh->prepare($sql);
     $like_del_stmt->bindValue(':post_is_liked_id', $delete_like, PDO::PARAM_INT);
-    $like_del_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $like_del_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $like_del_stmt->execute();
 }
 
@@ -189,7 +189,7 @@ function get_likes($get_likes) {
     INNER JOIN posts ON likes.post_is_liked_id = posts.post_id 
     WHERE likes.user_id = :user_id';
     $post_like_stmt = $dbh->prepare($sql);
-    $post_like_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $post_like_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $post_like_stmt->execute();
     while ($post_like_row = $post_like_stmt->fetch()) { 
         $post_likes[] = $post_like_row;
@@ -211,7 +211,7 @@ function insert_reply_like($insert_reply_like) {
     VALUES (NULL, :reply_is_liked_id, :user_id)'; // 重複不可
     $like_ins_stmt = $dbh->prepare($sql);
     $like_ins_stmt->bindValue(':reply_is_liked_id', $insert_reply_like, PDO::PARAM_INT);
-    $like_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $like_ins_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $like_ins_stmt->execute();
 }
 
@@ -221,7 +221,7 @@ function delete_reply_like($delete_reply_like) {
     $sql = 'DELETE FROM reply_likes WHERE user_id = :user_id AND reply_is_liked_id = :reply_is_liked_id';
     $like_del_stmt = $dbh->prepare($sql);
     $like_del_stmt->bindValue(':reply_is_liked_id', $delete_reply_like, PDO::PARAM_INT);
-    $like_del_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $like_del_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $like_del_stmt->execute();
 }
 
@@ -254,7 +254,7 @@ function get_rep_likes($get_rep_likes) {
     INNER JOIN replies ON reply_likes.reply_is_liked_id = replies.reply_id 
     WHERE reply_likes.user_id = :user_id';
     $reply_like_stmt = $dbh->prepare($sql);
-    $reply_like_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $reply_like_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $reply_like_stmt->execute();
     while ($reply_like_row = $reply_like_stmt->fetch()) { 
         $reply_likes[] = $reply_like_row;
@@ -304,7 +304,7 @@ function insert_bookmark($insert_bookmark) {
     VALUES (:user_id, :post_id)';
     $bm_ins_stmt = $dbh->prepare($sql);
     $bm_ins_stmt->bindValue(':post_id', $insert_bookmark, PDO::PARAM_INT);
-    $bm_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $bm_ins_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $bm_ins_stmt->execute();
 }
 
@@ -314,7 +314,7 @@ function delete_bookmark($delete_bookmark) {
     $sql = 'DELETE FROM bookmarks WHERE post_id = :post_id AND user_id = :user_id';
     $bm_del_stmt = $dbh->prepare($sql);
     $bm_del_stmt->bindValue(':post_id', $delete_bookmark, PDO::PARAM_INT);
-    $bm_del_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $bm_del_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $bm_del_stmt->execute();
 }
 
@@ -324,7 +324,7 @@ function get_bookmarks($get_bookmarks) {
     $sql = 'SELECT DISTINCT(post_id) FROM bookmarks 
     WHERE user_id = :user_id';
     $post_bm_stmt = $dbh->prepare($sql);
-    $post_bm_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $post_bm_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $post_bm_stmt->execute();
     while ($post_bm_row = $post_bm_stmt->fetch()) { 
         $post_bms[] = $post_bm_row;
@@ -346,7 +346,7 @@ function insert_rep_bookmark($insert_rep_bookmark) {
     VALUES (:reply_id, :user_id)';
     $bm_ins_stmt = $dbh->prepare($sql);
     $bm_ins_stmt->bindValue(':reply_id', $insert_rep_bookmark, PDO::PARAM_INT);
-    $bm_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $bm_ins_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $bm_ins_stmt->execute();
 }
 
@@ -356,7 +356,7 @@ function delete_rep_bookmark($delete_rep_bookmark) {
     $sql = 'DELETE FROM bookmarks WHERE reply_id = :reply_id AND user_id = :user_id';
     $bm_del_stmt = $dbh->prepare($sql);
     $bm_del_stmt->bindValue(':reply_id', $delete_rep_bookmark, PDO::PARAM_INT);
-    $bm_del_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $bm_del_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $bm_del_stmt->execute();
 }
 
@@ -366,7 +366,7 @@ function get_rep_bookmarks($get_rep_bookmarks) {
     $sql = 'SELECT DISTINCT(reply_id) FROM bookmarks 
     WHERE user_id = :user_id';
     $reply_bm_stmt = $dbh->prepare($sql);
-    $reply_bm_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $reply_bm_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $reply_bm_stmt->execute();
     while ($reply_bm_row = $reply_bm_stmt->fetch()) { 
         $reply_bms[] = $reply_bm_row;
@@ -381,25 +381,25 @@ function get_rep_bookmarks($get_rep_bookmarks) {
     return $reply_bm_id;
 }
 
-// カテゴリー名を登録
+// フォルダ名を登録
 function insert_category_name($insert_category_name) {
     $dbh = db_open();
     $sql = 'INSERT INTO categories (user_id, name)
     VALUES (:user_id, :name)';
     $category_ins_stmt = $dbh->prepare($sql);
-    $category_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $category_ins_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $category_ins_stmt->bindValue(':name', $insert_category_name, PDO::PARAM_STR);
     $category_ins_stmt->execute();
 }
 
-// ログインユーザーの全てのカテゴリー名とそのidを取得
+// ログインユーザーの全てのフォルダ名とそのidを取得
 function get_category_ids() {
     $dbh = db_open();
     $sql ='SELECT id, name FROM categories
     WHERE user_id = :user_id
     ORDER BY created_at ASC';
     $category_id_stmt = $dbh->prepare($sql);
-    $category_id_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $category_id_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $category_id_stmt->execute();
     while ($category_id_row = $category_id_stmt->fetch()) { 
         $category_ids[] = $category_id_row;
@@ -416,7 +416,7 @@ function insert_follow($insert_follow) {
     $sql = 'INSERT IGNORE INTO follows (follow, is_followed)
     VALUES (:follow, :is_followed)';
     $follow_ins_stmt = $dbh->prepare($sql);
-    $follow_ins_stmt->bindValue(':follow', $_SESSION['login']['member_id'], PDO::PARAM_INT); // フォローを実施したユーザー(今ログインしているユーザー)
+    $follow_ins_stmt->bindValue(':follow', $_SESSION['user_id'], PDO::PARAM_INT); // フォローを実施したユーザー(今ログインしているユーザー)
     $follow_ins_stmt->bindValue(':is_followed', $insert_follow, PDO::PARAM_INT); // フォローされたユーザー
     $follow_ins_stmt->execute();
 }
@@ -426,7 +426,7 @@ function delete_follow($delete_follow) {
     $dbh = db_open();
     $sql = 'DELETE FROM follows WHERE follow = :follow AND is_followed = :is_followed'; // followかつis_followedであるものを削除する
     $follow_del_stmt = $dbh->prepare($sql);
-    $follow_del_stmt->bindValue(':follow', $_SESSION['login']['member_id'], PDO::PARAM_INT );
+    $follow_del_stmt->bindValue(':follow', $_SESSION['user_id'], PDO::PARAM_INT );
     $follow_del_stmt->bindValue(':is_followed', $delete_follow, PDO::PARAM_INT);
     $follow_del_stmt->execute();
 }
@@ -471,8 +471,8 @@ function block_user() {
     SELECT block FROM blocks 
     WHERE is_blocked = :is_blocked';
     $block_stmt = $dbh->prepare($sql);
-    $block_stmt->bindValue(':block', $_SESSION['login']['member_id'], PDO::PARAM_INT);
-    $block_stmt->bindValue(':is_blocked', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $block_stmt->bindValue(':block', $_SESSION['user_id'], PDO::PARAM_INT);
+    $block_stmt->bindValue(':is_blocked', $_SESSION['user_id'], PDO::PARAM_INT);
     $block_stmt->execute();
     return $block_stmt;
 }
@@ -483,7 +483,7 @@ function get_block_user($get_block_user) {
     $sql ='SELECT block, is_blocked FROM blocks 
     WHERE block = :block AND is_blocked = :is_blocked';
     $block_stmt = $dbh->prepare($sql);
-    $block_stmt->bindValue(':block', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $block_stmt->bindValue(':block', $_SESSION['user_id'], PDO::PARAM_INT);
     $block_stmt->bindValue(':is_blocked', $get_block_user, PDO::PARAM_INT);
     $block_stmt->execute();
     $block_user = $block_stmt->fetch();
@@ -497,7 +497,7 @@ function get_blocked_user($get_blocked_user) {
     WHERE block = :block AND is_blocked = :is_blocked';
     $is_blocked_stmt = $dbh->prepare($sql);
     $is_blocked_stmt->bindValue(':block', $get_blocked_user, PDO::PARAM_INT);
-    $is_blocked_stmt->bindValue(':is_blocked', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $is_blocked_stmt->bindValue(':is_blocked', $_SESSION['user_id'], PDO::PARAM_INT);
     $is_blocked_stmt->execute();
     $blocked_user = $is_blocked_stmt->fetch();
     return $blocked_user;
@@ -514,7 +514,7 @@ function insert_icon($file_name, $save_path) {
     $icon_ins_stmt = $dbh->prepare($sql);
     $icon_ins_stmt->bindValue(':file_name', $file_name, PDO::PARAM_STR);
     $icon_ins_stmt->bindValue(':file_path', $save_path, PDO::PARAM_STR);
-    $icon_ins_stmt->bindValue(':user_id', $_SESSION['login']['member_id'], PDO::PARAM_INT);
+    $icon_ins_stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $icon_ins_stmt->execute();
 }
 

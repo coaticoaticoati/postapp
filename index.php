@@ -13,7 +13,7 @@ if (empty($_SESSION)) {
 $dbh = db_open();
 
 // リダイレクト先を変数に代入
-$redirect_back = 'Location: index.php';
+$redirect = 'Location: index.php';
 
 // -------投稿-------
 
@@ -54,35 +54,35 @@ if (isset($posts)) {
 // 削除ボタンが押された場合
 if (isset($_POST['delete_post'])) {
     delete_post((int)$_POST['delete_post']);
-    header($redirect_back);
+    header($redirect);
     exit;  
 }
 
 // いいねボタンが押された場合
 if (isset($_POST['insert_like'])) {
     insert_like((int)$_POST['insert_like']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // いいね解除ボタンが押された場合
 if (isset($_POST['delete_like'])) {
     delete_like((int)$_POST['delete_like']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // ブックマークボタンが押された場合
 if (isset($_POST['insert_bm'])) {
     insert_bookmark((int)$_POST['insert_bm']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // ブックマーク解除ボタンが押された場合
 if (isset($_POST['delete_bm'])) {
     delete_bookmark((int)$_POST['delete_bm']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
@@ -91,35 +91,35 @@ if (isset($_POST['delete_bm'])) {
 // いいねが押された場合
 if (isset($_POST['insert_reply_like'])) {
     insert_reply_like((int)$_POST['insert_reply_like']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // いいね解除ボタンが押された場合
 if (isset($_POST['delete_reply_like'])) {
     delete_reply_like((int)$_POST['delete_reply_like']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // 削除ボタンが押された場合
 if (isset($_POST['delete_reply'])) {
     delete_reply($_POST['delete_reply']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // ブックマークボタンが押された場合
 if (isset($_POST['insert_reply_bm'])) {
     insert_rep_bookmark((int)$_POST['insert_reply_bm']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // ブックマーク解除ボタンが押された場合
 if (isset($_POST['delete_reply_bm'])) {
     delete_rep_bookmark((int)$_POST['delete_reply_bm']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 

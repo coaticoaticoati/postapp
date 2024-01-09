@@ -23,7 +23,6 @@ if (isset($_POST['search'])) {
         $search_array[] = '%'.$explode_word.'%';
     }
     
-
     // 投稿内容とユーザー名を検索
     $sql = 'SELECT post_id, content, posts.created_at, members.member_id, file_path, name FROM members 
             LEFT OUTER JOIN posts ON members.member_id = posts.user_id
@@ -130,106 +129,109 @@ while ($block_row = $block_stmt->fetch()) {
                     <!-- ポストの検索結果 -->
                     <div class="post-results">
                         <h3>ポストの検索結果</h3>
-                            <?php 
-                            foreach ($search_post_results as $search_post) :
-                                // ブロックしている、されている場合、false となり、検索結果を表示しない
-                                $block_search = true;
-                                foreach ($blocks as $block) {
-                                    if ($block['is_blocked'] === $search_post['member_id']) {
-                                        $block_search = false;
-                                    }
-                                }  // $block_search が true の場合、検索結果を表示する
-                                if ($block_search) :
-                            ?>      
-                                    <!-- アイコン -->
-                                    <div>      
-                                        <?php $icon_row = get_icon($search_post['member_id']) ?>
-                                        <?php if (empty($icon_row)) : ?>
-                                            <p><img src="images/animalface_tanuki.png" class="icon"><p>
-                                        <?php else : ?>        
-                                            <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <!-- ユーザー名 -->
-                                    <div class="search-username">
-                                        <p><?= h(get_user_name($search_post['member_id'])) ?></p>
-                                    </div>
-
-                                    <!-- 投稿文 -->
-                                    <div class="">
-                                        <p><?= h($search_post['content']) ?></p>
-                                    </div>
-
-                                    <!-- 画像を表示 -->
-                                    <div>                                    
-                                        <?php if(isset($row['file_path'])) : ?>
-                                            <p><img src="<?= h($search_post['file_path']) ?>" class="image"></p>
-                                        <?php endif; ?>
-                                    </div>    
-
-                                    <!-- 投稿日時 -->
-                                    <div>
-                                        <p><?= h($search_post['created_at']) ?></p>
-                                    </div>
-
-                                    <!-- いいねの数 -->
-                                    <p class="timeline-likes"><img src="images/heart.png"><?= h(get_likes_number($post['post_id'])) ?></p>
-                                    
-                                    <div class="search-buttons">
-                                        <ul class="search-btn-list">
-                                            <!-- 返信ボタン -->
-                                            <li><button><a href="reply.php?p_id=<?= h($search_post['post_id']) ?>#reply">返信</a></button></li>
-
-                                            <!-- アカウントボタン -->
-                                            <li><button><a href="user.php?id=<?= h($search_post['member_id']) ?>">アカウント</a></button></li>
-                                            
-                                            <!-- いいねボタン -->
-                                            <!-- 投稿に対するいいねボタン -->
-                                            <form action="" method="post">
-                                                <?php
-                                                $post_is_liked_id = false;
-                                                foreach($post_likes as $post_like) {
-                                                    if($post_like['post_is_liked_id'] === $search_post['post_id']) {
-                                                        $post_is_liked_id = true;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <?php if ($post_is_liked_id) : ?>
-                                                    <input type="hidden" name="delete_like" value=<?= h($search_post['post_id']) ?>>
-                                                    <li><button type="submit">いいね解除</button></li>
-                                                <?php else : ?>
-                                                    <input type="hidden" name="insert_like" value=<?= h($search_post['post_id']) ?>>
-                                                    <li><button type="submit">いいね</button></li>
-                                                <?php endif; ?>                         
-                                            </form>  
-
-                                            <!-- ブックマークボタン -->
-                                            <?php $post_bm_id = get_bookmarks($search_post['post_id']) ?>
-                                            <form action="" method="post">
-                                                <?php if ($post_bm_id) : ?>
-                                                    <input type="hidden" name="delete_bm" value=<?= h($search_post['post_id']) ?>>
-                                                    <li><button type="submit">ブックマーク解除</button></li>
-                                                <?php else : ?>
-                                                    <input type="hidden" name="insert_bm" value=<?= h($search_post['post_id']) ?>>
-                                                    <li><button type="submit">ブックマーク</button></li>
-                                                <?php endif; ?>                         
-                                            </form>
-                            
-                                            <!-- 削除ボタン -->
-                                            <!-- ログインユーザーの投稿のみ表示する -->            
-                                            <?php if($search_post['member_id'] === $_SESSION['user_id']) : ?>
-                                                <!-- 投稿に対する削除ボタン -->  
-                                                <form action="" method="post">
-                                                    <input type="hidden" name="delete_post" value=<?= h($search_post['post_id']) ?>>
-                                                    <li><button type="submit">削除</button></li>
-                                                </form>
+                            <?php
+                            // ユーザー名で検索にヒットしたユーザーが1つ以上投稿している場合は表示する
+                            if ($search_post_results[0]['content'] !== NULL) :
+                                foreach ($search_post_results as $search_post) :
+                                    // ブロックしている、されている場合、false となり、検索結果を表示しない
+                                    $block_search = true;
+                                    foreach ($blocks as $block) {
+                                        if ($block['is_blocked'] === $search_post['member_id']) {
+                                            $block_search = false;
+                                        }
+                                    }  // $block_searchがtrueの場合、検索結果を表示する
+                                    if ($block_search) :
+                                ?>      
+                                        <!-- アイコン -->
+                                        <div>      
+                                            <?php $icon_row = get_icon($search_post['member_id']) ?>
+                                            <?php if (empty($icon_row)) : ?>
+                                                <p><img src="images/animalface_tanuki.png" class="icon"><p>
+                                            <?php else : ?>        
+                                                <p><img src="<?= h($icon_row) ?>" class="icon" ></p>
                                             <?php endif; ?>
-                                        </ul> 
-                                    </div>        
-                                <?php endif; ?>
-                            <?php endforeach; ?>
+                                        </div>
+
+                                        <!-- ユーザー名 -->
+                                        <div class="search-username">
+                                            <p><?= h(get_user_name($search_post['member_id'])) ?></p>
+                                        </div>
+
+                                        <!-- 投稿文 -->
+                                        <div class="">
+                                            <p><?= h($search_post['content']) ?></p>
+                                        </div>
+
+                                        <!-- 画像を表示 -->
+                                        <div>                                    
+                                            <?php if(isset($row['file_path'])) : ?>
+                                                <p><img src="<?= h($search_post['file_path']) ?>" class="image"></p>
+                                            <?php endif; ?>
+                                        </div>    
+
+                                        <!-- 投稿日時 -->
+                                        <div>
+                                            <p><?= h($search_post['created_at']) ?></p>
+                                        </div>
+
+                                        <!-- いいねの数 -->
+                                        <p class="timeline-likes"><img src="images/heart.png"><?= h(get_likes_number($post['post_id'])) ?></p>
+                                        
+                                        <div class="search-buttons">
+                                            <ul class="search-btn-list">
+                                                <!-- 返信ボタン -->
+                                                <li><button><a href="reply.php?p_id=<?= h($search_post['post_id']) ?>">返信</a></button></li>
+
+                                                <!-- アカウントボタン -->
+                                                <li><button><a href="user.php?id=<?= h($search_post['member_id']) ?>">アカウント</a></button></li>
+                                                
+                                                <!-- いいねボタン -->
+                                                <!-- 投稿に対するいいねボタン -->
+                                                <form action="" method="post">
+                                                    <?php
+                                                    $post_is_liked_id = false;
+                                                    foreach($post_likes as $post_like) {
+                                                        if($post_like['post_is_liked_id'] === $search_post['post_id']) {
+                                                            $post_is_liked_id = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                    ?>
+                                                    <?php if ($post_is_liked_id) : ?>
+                                                        <input type="hidden" name="delete_like" value=<?= h($search_post['post_id']) ?>>
+                                                        <li><button type="submit">いいね解除</button></li>
+                                                    <?php else : ?>
+                                                        <input type="hidden" name="insert_like" value=<?= h($search_post['post_id']) ?>>
+                                                        <li><button type="submit">いいね</button></li>
+                                                    <?php endif; ?>                         
+                                                </form>  
+
+                                                <!-- ブックマークボタン -->
+                                                <?php $post_bm_id = get_bookmarks($search_post['post_id']) ?>
+                                                <form action="" method="post">
+                                                    <?php if ($post_bm_id) : ?>
+                                                        <input type="hidden" name="delete_bm" value=<?= h($search_post['post_id']) ?>>
+                                                        <li><button type="submit">ブックマーク解除</button></li>
+                                                    <?php else : ?>
+                                                        <input type="hidden" name="insert_bm" value=<?= h($search_post['post_id']) ?>>
+                                                        <li><button type="submit">ブックマーク</button></li>
+                                                    <?php endif; ?>                         
+                                                </form>
+                                
+                                                <!-- 削除ボタン -->
+                                                <!-- ログインユーザーの投稿のみ表示する -->            
+                                                <?php if($search_post['member_id'] === $_SESSION['user_id']) : ?>
+                                                    <!-- 投稿に対する削除ボタン -->  
+                                                    <form action="" method="post">
+                                                        <input type="hidden" name="delete_post" value=<?= h($search_post['post_id']) ?>>
+                                                        <li><button type="submit">削除</button></li>
+                                                    </form>
+                                                <?php endif; ?>
+                                            </ul> 
+                                        </div>        
+                                    <?php endif;
+                                endforeach; 
+                            endif;  ?>  
                     </div>
 
                     <!-- ユーザーの検索結果 -->

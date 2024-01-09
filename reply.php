@@ -20,49 +20,49 @@ $reply_id = $_GET['r_id'];
 if (empty($post_id)) {
     $sql = 'SELECT post_id FROM replies WHERE reply_id = :reply_id';
     $post_id_stmt = $dbh->prepare($sql);
-    $post_id_stmt->bindValue(':reply_id', $_SESSION['reply_btn_reply_id'], PDO::PARAM_INT);
+    $post_id_stmt->bindValue(':reply_id', $reply_id, PDO::PARAM_INT);
     $post_id_stmt->execute();
     $post_id = $post_id_stmt->fetch();
     $post_id = $post_id['post_id'];
 }
 
 // リダイレクト先を変数に代入
-$redirect_back = 'Location: reply.php';
+$redirect = 'Location: reply.php?p_id='.$post_id;
 
 // ------- 投稿 -------
 
 // いいねが押された場合
 if (isset($_POST['insert_like'])) {
     insert_like((int)$_POST['insert_like']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // いいね解除ボタンが押された場合
 if (isset($_POST['delete_like'])) {
     delete_like((int)$_POST['delete_like']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // 削除ボタンが押された場合
 if (isset($_POST['delete_post'])) {
     delete_post($_POST['delete_post']); 
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // ブックマークボタンが押された場合
 if (isset($_POST['insert_bm'])) {
     insert_bookmark((int)$_POST['insert_bm']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // ブックマーク解除ボタンが押された場合
 if (isset($_POST['delete_bm'])) {
     delete_bookmark((int)$_POST['delete_bm']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
@@ -71,35 +71,35 @@ if (isset($_POST['delete_bm'])) {
 // いいねが押された場合
 if (isset($_POST['insert_reply_like'])) {
     insert_reply_like((int)$_POST['insert_reply_like']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // いいね解除ボタンが押された場合
 if (isset($_POST['delete_reply_like'])) {
     delete_reply_like((int)$_POST['delete_reply_like']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // 削除ボタンが押された場合
 if (isset($_POST['delete_reply'])) {
     delete_reply($_POST['delete_reply']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // ブックマークボタンが押された場合
 if (isset($_POST['insert_reply_bm'])) {
     insert_rep_bookmark((int)$_POST['insert_reply_bm']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
 // ブックマーク解除ボタンが押された場合
 if (isset($_POST['delete_reply_bm'])) {
     delete_rep_bookmark((int)$_POST['delete_reply_bm']);
-    header($redirect_back);
+    header($redirect);
     exit;
 }
 
@@ -159,7 +159,7 @@ if(strlen($_POST['reply_form']) > 600) {
 if (isset($_POST['reply_form'])) {
     if(empty($reply_error)) { 
         insert_reply((int)$_POST['post_id'], $_POST['reply_form']);
-        header('Location: reply.php');
+        header($redirect);
         exit;
     }
 }
@@ -178,12 +178,11 @@ if(strlen($_POST['reply_reply_form']) > 200) {
     $reply_reply_error['reply_id'] = $_POST['reply_id'];
 }
 
-
 // ボタンが押された場合
 if (isset($_POST['reply_reply_form'])) {
     if(empty($reply_reply_error)) { 
         insert_reply_reply((int)$_POST['post_id'], $_POST['reply_reply_form'], (int)$_POST['reply_id']);
-        header('Location: reply.php');
+        header($redirect);
         exit;
     }
 }

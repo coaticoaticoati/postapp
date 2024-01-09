@@ -205,7 +205,7 @@ if (isset($_POST['block_user'])) {
 <html lang="ja">
     <head>
         <meta charset="utf-8">
-        <title><?= h($_SESSION['login']['name'])?>さんのプロフィール</title>
+        <title>プロフィール</title>
         <link rel="stylesheet" href="stylesheet.css">
     </head>
     <body>
@@ -420,7 +420,7 @@ if (isset($_POST['block_user'])) {
                         <h3 class="user-title">いいね一覧</h3>
                         <?php
                         foreach ($post_likes_reps as $post_like_rep) : 
-                            // ブロックしている、されているか確認
+                            // ブロックしている、されているか確認→その場合表示しない
                             $block_like = true;
                             foreach ($blocks as $block) {
                                 if ($block['is_blocked'] === $post_like_rep['user_id'] ) {

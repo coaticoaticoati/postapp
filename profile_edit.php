@@ -124,7 +124,7 @@ if (isset($_POST['delete_profile'])) {
                     <div class="edit-user">
                         <h3>ユーザー名を編集</h3>
                         <form action="" method="post">    
-                            <input type="text" name="update_name" value="<?= h($_SESSION['login']['name']) ?>" class="textbox">
+                            <input type="text" name="update_name" value="<?= h(get_user_name($_SESSION['user_id'])) ?>" class="textbox">
                             <button type="submit">送信</button>
                         </form>
                     </div>
