@@ -133,7 +133,7 @@ if($_POST['content'] === '') {
 if(strlen($_POST['content']) > 600) {
     $error['content'] = 'over';
 }
-
+var_dump($_FILES['image']);
 
 // ------投稿＆画像アップロード-------
 
@@ -142,7 +142,8 @@ if(strlen($_POST['content']) > 600) {
 if (isset($_FILES['image'])) {
     if (!isset($error)) {
         // 投稿文と画像を登録
-        if ($_FILES['image']['size'] > 0) {
+        if (!empty($_FILES['image']['name'])) {
+
             // ファイルデータを取得
             $file = $_FILES['image'];
             // データを変数に代入
@@ -178,7 +179,7 @@ if (isset($_FILES['image'])) {
                     if (move_uploaded_file($file_tmp_path, $save_path)) { 
                         // データベースにも保存する（投稿文、ファイル名、ファイルパス）
                         insert_file($_POST['content'], $file_name, $save_path);
-                        header('Location: index.php');
+                        //header('Location: index.php');
                         exit;
                     // 画像を保存できなかった場合    
                     } else {
@@ -188,16 +189,15 @@ if (isset($_FILES['image'])) {
                 } else {
                     $error['file_upload'] = 'not_upload';
                 }
-            }      
+            }  
         } else {
             // 投稿文のみの登録
             insert_post($_POST['content']);
             header('Location: index.php');
             exit;
         }
-    }   
+    }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="ja">

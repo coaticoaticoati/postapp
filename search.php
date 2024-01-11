@@ -175,7 +175,7 @@ while ($block_row = $block_stmt->fetch()) {
                                         </div>
 
                                         <!-- いいねの数 -->
-                                        <p class="timeline-likes"><img src="images/heart.png"><?= h(get_likes_number($post['post_id'])) ?></p>
+                                        <p class="timeline-likes"><img src="images/heart.png"> <?= h(get_likes_number($post['post_id'])) ?></p>
                                         
                                         <div class="search-buttons">
                                             <ul class="search-btn-list">
