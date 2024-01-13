@@ -16,6 +16,7 @@ https://ss1.xrea.com/coaticoaticoati95142.s239.xrea.com/postapp/
 以上の理由から、Xの基本機能に、フォルダ分け機能を取り入れたアプリケーションを開発をすることにしました。
 
 ## アプリケーションのイメージ
+![アプリケーションのイメージGIF](https://github.com/coaticoaticoati/postapp/assets/150308090/3bbd03ab-cbf0-4b4f-9d36-58ca2e261057)
 
 ## 使用技術
 HTML  
