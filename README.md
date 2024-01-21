@@ -1,5 +1,6 @@
 ## postapp
-
+XのようなSNSアプリで、200文字以内のテキストや画像を投稿することができます。  
+主な機能として、フォロー機能、コメント機能、いいね機能、そしてブックマーク機能が実装されています。
 
 ## URL
 https://ss1.xrea.com/coaticoaticoati95142.s239.xrea.com/postapp/
@@ -18,12 +19,23 @@ https://ss1.xrea.com/coaticoaticoati95142.s239.xrea.com/postapp/
 ![アプリケーションのイメージGIF](https://github.com/coaticoaticoati/postapp/assets/150308090/3bbd03ab-cbf0-4b4f-9d36-58ca2e261057)
 
 ## 使用技術
+#### フロントエンド
 HTML  
 CSS  
-PHP  
+#### バックエンド
+PHP 
+#### データ
 MariaDB
 
 ## 機能一覧
+新規登録・ログイン機能  
+プロフィール編集機能（アイコン、紹介文）  
+テキスト・写真投稿機能 
+フォロー機能
+コメント投稿機能  
+検索機能  
+いいね機能  
+ブックマーク機能  
 
 ## DB設計
 
@@ -83,7 +95,8 @@ MariaDB
 ![検索結果のサンプルGIF](https://github.com/coaticoaticoati/postapp/assets/150308090/2dbb0c0a-7bdc-4905-86b1-116fde4aaabb)
 
 ## 苦労したところ
-#### 
+#### 再帰処理の理解
+コメントを階層的に表示するために再帰処理を採用しましたが、初めは再帰処理のコードがどのように動作しているかを理解するのに苦労しました。そのため、階層ごとに配列の中身を確認しながら、処理の流れを理解するようにしました。
 
 ## 今後実装したい機能
 いいねのランキング機能  
