@@ -133,7 +133,6 @@ if($_POST['content'] === '') {
 if(strlen($_POST['content']) > 600) {
     $error['content'] = 'over';
 }
-var_dump($_FILES['image']);
 
 // ------投稿＆画像アップロード-------
 
