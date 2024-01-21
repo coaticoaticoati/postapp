@@ -19,23 +19,21 @@ https://ss1.xrea.com/coaticoaticoati95142.s239.xrea.com/postapp/
 ![アプリケーションのイメージGIF](https://github.com/coaticoaticoati/postapp/assets/150308090/3bbd03ab-cbf0-4b4f-9d36-58ca2e261057)
 
 ## 使用技術
-#### フロントエンド
 HTML  
 CSS  
-#### バックエンド
-PHP 
-#### データ
+PHP  
 MariaDB
 
 ## 機能一覧
 新規登録・ログイン機能  
 プロフィール編集機能（アイコン、紹介文）  
-テキスト・写真投稿機能 
-フォロー機能
+テキスト・写真投稿機能   
+フォロー機能  
 コメント投稿機能  
 検索機能  
 いいね機能  
 ブックマーク機能  
+ブロック機能
 
 ## DB設計
 
@@ -48,14 +46,14 @@ MariaDB
 | members | ユーザーの登録情報 |  
 | profiles | ユーザーのプロフィール |  
 | icons | ユーザーのアイコン |  
-| posts | 投稿と画像 |  
-| replies | コメント|  
-| likes | 投稿に対するいいね |  
-| reply_likes | コメントに対するいいね |  
-| follows | フォロー、フォロワー |  
-| bookmarks | ブックマーク |  
+| posts | テキストと画像の投稿情報 |  
+| replies | コメント情報|  
+| likes | 投稿に対するいいね情報 |  
+| reply_likes | コメントに対するいいね情報 |  
+| follows | フォロー、フォロワー情報 |  
+| bookmarks | ブックマーク情報 |  
 | categories | ブックマークのフォルダ名 |  
-| blocks | ブロック |  
+| blocks | ブロック情報 |  
 
 
 ## アプリケーションの特徴
