@@ -38,6 +38,7 @@ MariaDB
 ## DB設計
 
 #### ER図
+![postapp_erd](https://github.com/coaticoaticoati/postapp/assets/150308090/34105c6c-ac48-4326-abc5-712515a6da02)
 
 #### 各種テーブル
 
