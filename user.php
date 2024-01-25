@@ -108,7 +108,7 @@ if (isset($_POST['delete_reply_bm'])) {
 
 // ----- いいね ------
 
-// ログインユーザーの、投稿と返信のいいねを取得
+// 投稿と返信のいいねを取得
 $post_likes_reps = get_likes_reps($user_id);
 
 // 投稿と返信をまとめた$post_likes_repsを日時順に並び変える
@@ -132,8 +132,8 @@ if (isset($_POST['insert_follow'])) {
     exit;
 }
 
-// ログインユーザーのフォロー一覧を取得
-$following_user_list = get_follow($_SESSION['user_id']);
+// フォロー一覧を取得
+$following_user_list = get_follow($user_id);
 
 // -------ブロック---------
 
@@ -336,10 +336,13 @@ if (isset($_POST['block_user'])) {
                                     </form>
 
                                     <!-- 削除ボタン -->
-                                    <form action="" method="post">
-                                        <input type="hidden" name="delete_post" value=<?= h($post_row['post_id']) ?>> 
-                                        <li><input type="submit" value="削除" class="user-button"></li>
-                                    </form>
+                                    <!-- ログインユーザーの投稿のみ表示する -->
+                                    <?php if($_SESSION['user_id'] === $user_id) : ?>
+                                        <form action="" method="post">
+                                            <input type="hidden" name="delete_post" value=<?= h($post_row['post_id']) ?>> 
+                                            <li><input type="submit" value="削除" class="user-button"></li>
+                                        </form>
+                                    <?php endif; ?>
                                 </ul>
                             </div>
                         <?php endwhile; ?> 
@@ -407,10 +410,13 @@ if (isset($_POST['block_user'])) {
                                         <?php endif; ?>                         
                                     </form>
                                     <!-- 削除ボタン -->
-                                    <form action="" method="post">
-                                        <input type="hidden" name="delete_reply" value=<?= h($reply_row['reply_id']) ?>> 
-                                        <li><input type="submit" value="削除" class="user-button"></li>
-                                    </form>
+                                    <!-- ログインユーザーの投稿のみ表示する -->
+                                    <?php if($_SESSION['user_id'] === $user_id) : ?>
+                                        <form action="" method="post">
+                                            <input type="hidden" name="delete_reply" value=<?= h($reply_row['reply_id']) ?>> 
+                                            <li><input type="submit" value="削除" class="user-button"></li>
+                                        </form>
+                                    <?php endif; ?>    
                                 </ul>
                             </div>    
                         <?php endwhile; ?>       
@@ -515,7 +521,7 @@ if (isset($_POST['block_user'])) {
 
                                         <!-- 削除ボタン -->
                                         <!-- ログインユーザーの投稿or返信いいねのみ表示する -->
-                                        <?php if ($post_like_rep['user_id'] === $user_id) : ?>
+                                        <?php if ($_SESSION['user_id'] === $post_like_rep['user_id']) : ?>
                                             <!-- 返信に対する削除ボタン-->
                                             <?php if (isset($post_like_rep['reply_id'])) : ?>
                                                 <form action="" method="post">

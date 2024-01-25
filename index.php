@@ -157,8 +157,8 @@ if (isset($_FILES['image'])) {
             $save_path = 'images/'.$save_file_name; // 保存先のパス
 
             // 画像ファイルのバリデーション
-            // ファイルサイズは1MB未満か
-            if ($file_size > 1048576 || $file_error === 2) {
+            // ファイルサイズは2MB未満か
+            if ($file_size > 2097152 || $file_error === 2) {
                 $error['file_size'] = 'over';
             }
 
@@ -178,7 +178,7 @@ if (isset($_FILES['image'])) {
                     if (move_uploaded_file($file_tmp_path, $save_path)) { 
                         // データベースにも保存する（投稿文、ファイル名、ファイルパス）
                         insert_file($_POST['content'], $file_name, $save_path);
-                        //header('Location: index.php');
+                        header('Location: index.php');
                         exit;
                     // 画像を保存できなかった場合    
                     } else {
@@ -224,7 +224,7 @@ if (isset($_FILES['image'])) {
                     <h3>こんにちは、<?= h(get_user_name($_SESSION['user_id'])) ?>さん</h3>
                     <form action="" method="post" enctype="multipart/form-data">
                         <textarea name="content" class="textarea-post"></textarea>    
-                        <input type="hidden" name="MAX_FILE_SIZE" value="1048576"><!---ファイルの最大サイズを指定--->
+                        <input type="hidden" name="MAX_FILE_SIZE" value="2097152"><!---ファイルの最大サイズを指定--->
                         <div class="form">
                             <input type="file" name="image" accept="image/*" class="image-upload">
                             <button type="submit" class="btn-post-form">ポストする</button>
@@ -241,7 +241,7 @@ if (isset($_FILES['image'])) {
                     <?php endif; ?>
 
                     <?php if ($error['file_size'] === 'over') : ?>
-                        <p>ファイルサイズは1MB未満にしてください。</p>
+                        <p>ファイルサイズは2MB未満にしてください。</p>
                     <?php endif; ?>
 
                     <?php if ($error['file_ext'] === 'not_match') : ?>

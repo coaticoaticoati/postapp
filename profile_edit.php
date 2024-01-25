@@ -36,8 +36,8 @@ if (isset($_FILES['image'])) {
     $save_path = $upload_dir.$save_file_name; //保存先のパス(+日付)
 
     // ファイルのバリデーション
-    // ファイルサイズは1MB未満か
-    if ($file_size > 1048576 || $file_error === 2 ) {
+    // ファイルサイズは2MB未満か
+    if ($file_size > 2097152 || $file_error === 2 ) {
         $error['file_size'] = 'over';
     }
     // 拡張は画像形式か
@@ -134,14 +134,14 @@ if (isset($_POST['delete_profile'])) {
                         <h3>アイコンを編集</h3>
                         <P><img src="<?= h(get_icon($_SESSION['user_id'])) ?>"></P>
                         <form action="" method="post" enctype="multipart/form-data">    
-                            <input type="hidden" name="MAX_FILE_SIZE" value="1048576"><!-----ファイルの最大サイズを指定----->
+                            <input type="hidden" name="MAX_FILE_SIZE" value="2097152"><!-----ファイルの最大サイズを指定----->
                             <input type="file" name="image" accept="image/*">
                             <button type="submit">送信</button> 
                         </form>
                         
                         <!-- エラーメッセージの表示 -->
                         <?php if ($error['file_size'] === 'over') : ?>
-                            <p>ファイルサイズは1MB未満にしてください。</p>
+                            <p>ファイルサイズは2MB未満にしてください。</p>
                         <?php endif; ?>
 
                         <?php if ($error['file_ext'] === 'not_match') : ?>
