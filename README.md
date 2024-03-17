@@ -1,6 +1,5 @@
 ## postapp
 X（旧Twitter）のようなSNSアプリで、200文字以内のテキストや画像を投稿することができます。  
-主な機能として、フォロー機能、コメント機能、いいね機能、そしてブックマーク機能が実装されています。
 
 ## URL
 https://ss1.xrea.com/coaticoaticoati95142.s239.xrea.com/postapp/
